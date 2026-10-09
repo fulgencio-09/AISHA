@@ -155,7 +155,6 @@ class Asignatura extends Controller
         $asignatura = ModelsAsignatura::find($id);
         $asignatura->valor = $request->valor;
         $asignatura->total = $request->total;
-        $asignatura->año = $request->año;
         $asignatura->semestre = $request->semestre;
         $asignatura->sede = $request->sede;
         $asignatura->periodo = $request->periodo;
