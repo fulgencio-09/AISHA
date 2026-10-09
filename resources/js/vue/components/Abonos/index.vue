@@ -1083,7 +1083,7 @@ export default {
                         this.pagos = res.data;
                         // console.table(this.pagos)
                         this.asignatura_id = '';
-                        this.creditoSeleccionado = '';
+                        // Se conserva el crédito mostrado después de guardar el pago.
                         this.fechas = '';
                         this.cantidad = '';
                         this.movimiento = '';
