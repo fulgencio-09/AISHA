@@ -8,60 +8,36 @@ use App\Models\Respaldo;
 
 class HomeController extends Controller
 {
-    /**
-     * Create a new controller instance.
-     *
-     * @return void
-     */
     public function __construct()
     {
         $this->middleware('auth');
     }
 
-    /**
-     * Show the application dashboard.
-     *
-     * @return \Illuminate\Contracts\Support\Renderable
-     */
     public function index()
     {
         return view('home');
     }
 
-    // Dashboard
     public function matriculados()
     {
         $matriculados = DB::table('asignaturas as a')
             ->join('estudiantes as e', 'e.id', '=', 'a.estudiante_id')
-            ->selectRaw("
-                MONTH(a.created_at) AS mes_numero,
-                COUNT(DISTINCT a.estudiante_id) AS cantidad
-            ")
+            ->selectRaw("MONTH(a.created_at) AS mes_numero, COUNT(DISTINCT a.estudiante_id) AS cantidad")
             ->whereYear('a.created_at', now()->year)
             ->groupByRaw('MONTH(a.created_at)')
             ->orderByRaw('MONTH(a.created_at)')
             ->get();
 
         $meses = [
-            1  => 'Enero',
-            2  => 'Febrero',
-            3  => 'Marzo',
-            4  => 'Abril',
-            5  => 'Mayo',
-            6  => 'Junio',
-            7  => 'Julio',
-            8  => 'Agosto',
-            9  => 'Septiembre',
-            10 => 'Octubre',
-            11 => 'Noviembre',
-            12 => 'Diciembre',
+            1 => 'Enero', 2 => 'Febrero', 3 => 'Marzo', 4 => 'Abril',
+            5 => 'Mayo', 6 => 'Junio', 7 => 'Julio', 8 => 'Agosto',
+            9 => 'Septiembre', 10 => 'Octubre', 11 => 'Noviembre', 12 => 'Diciembre'
         ];
 
         $resultado = [];
 
         foreach ($meses as $numero => $nombre) {
             $registro = $matriculados->firstWhere('mes_numero', $numero);
-
             $resultado[] = [
                 'mes_numero' => $numero,
                 'mes' => $nombre,
@@ -73,29 +49,32 @@ class HomeController extends Controller
     }
 
     /**
-     * Semestres disponibles para el filtro financiero del dashboard.
-     *
-     * Se obtienen directamente de asignaturas porque ese es el campo que
-     * realmente utiliza el resumen de pagos para filtrar. Así el dashboard
-     * no depende de que la tabla periodos tenga registros activos.
+     * Devuelve las combinaciones de año y periodo académico que realmente
+     * existen en las matrículas. El filtro financiero trabaja con ambos
+     * campos para no mezclar, por ejemplo, 2025 periodo 1 con 2026 periodo 1.
      */
     public function semestres()
     {
         $periodos = DB::table('asignaturas')
-            ->whereNotNull('semestre')
-            ->where('semestre', '!=', '')
-            ->select('semestre')
+            ->whereNotNull('año')
+            ->where('año', '!=', '')
+            ->whereNotNull('periodo')
+            ->where('periodo', '!=', '')
+            ->select('año', 'periodo')
             ->distinct()
-            ->orderBy('semestre')
+            ->orderBy('año', 'desc')
+            ->orderBy('periodo')
             ->get();
 
         $resultado = $periodos->map(function ($periodo) {
-            $valor = (string) $periodo->semestre;
+            $ano = (string) $periodo->año;
+            $periodoAcademico = (string) $periodo->periodo;
 
             return [
-                'id' => $valor,
-                'periodo' => $valor,
-                'nombre' => 'Semestre ' . $valor,
+                'id' => $ano . '-' . $periodoAcademico,
+                'ano' => $ano,
+                'periodo' => $periodoAcademico,
+                'nombre' => $ano . ' - Periodo ' . $periodoAcademico,
             ];
         })->values();
 
@@ -121,39 +100,42 @@ class HomeController extends Controller
         ];
     }
 
+    /**
+     * Resume los valores únicamente para el año y periodo seleccionados.
+     */
     public function resumenPagos(Request $request)
     {
-        // El filtro es obligatorio para el dashboard: se selecciona desde
-        // la lista de semestres obtenida de asignaturas.
-        $semestre = $request->filled('semestre')
-            ? trim((string) $request->input('semestre'))
+        $ano = $request->filled('ano')
+            ? trim((string) $request->input('ano'))
             : null;
 
-        // TOTAL DEUDA Y PENDIENTE
+        $periodo = $request->filled('periodo')
+            ? trim((string) $request->input('periodo'))
+            : null;
+
         $asignaturasQuery = DB::table('asignaturas');
 
-        if ($semestre !== null && $semestre !== '') {
-            $asignaturasQuery->where('semestre', $semestre);
+        if ($ano !== null && $ano !== '') {
+            $asignaturasQuery->where('año', $ano);
+        }
+
+        if ($periodo !== null && $periodo !== '') {
+            $asignaturasQuery->where('periodo', $periodo);
         }
 
         $asignaturas = $asignaturasQuery
-            ->selectRaw('
-                COALESCE(SUM(total), 0) AS total_deuda,
-                COALESCE(SUM(valor), 0) AS total_pendiente
-            ')
+            ->selectRaw('COALESCE(SUM(total), 0) AS total_deuda, COALESCE(SUM(valor), 0) AS total_pendiente')
             ->first();
 
-        // TOTAL PAGADO
         $abonosQuery = DB::table('abonos')
-            ->join(
-                'asignaturas',
-                'asignaturas.id',
-                '=',
-                'abonos.asignatura_id'
-            );
+            ->join('asignaturas', 'asignaturas.id', '=', 'abonos.asignatura_id');
 
-        if ($semestre !== null && $semestre !== '') {
-            $abonosQuery->where('asignaturas.semestre', $semestre);
+        if ($ano !== null && $ano !== '') {
+            $abonosQuery->where('asignaturas.año', $ano);
+        }
+
+        if ($periodo !== null && $periodo !== '') {
+            $abonosQuery->where('asignaturas.periodo', $periodo);
         }
 
         $totalPagado = $abonosQuery->sum('abonos.cantidad');
