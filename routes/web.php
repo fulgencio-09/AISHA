@@ -68,7 +68,7 @@ Route::get('/dashboard/matriculados-mes', [App\Http\Controllers\HomeController::
 Route::middleware('admin')->group(function(){
     Route::get('/respaldos', [App\Http\Controllers\HomeController::class, 'log'])->name('log');
     Route::get('/dashboard/resumen-pagos', [App\Http\Controllers\HomeController::class, 'resumenPagos']);
-    Route::get('/dashboard/semestres', [App\Http\Controllers\Periodos::class, 'semestres']);
+    Route::get('/dashboard/semestres', [App\Http\Controllers\HomeController::class, 'semestres']);
 });
 
 
