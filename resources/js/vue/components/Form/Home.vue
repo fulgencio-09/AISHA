@@ -26,29 +26,43 @@
 
             <!-- RESUMEN DE PAGOS -->
             <div class="row mt-3">
-                <!--
                 <div class="col-12 mb-3">
-                    <div class="d-flex align-items-center">
-                        <label class="fw-bold me-2">
-                            Semestre:
-                        </label>
-                        <select
-                            v-model="semestreSeleccionado"
-                            @change="obtenerResumenPagos"
-                            class="form-select"
-                            style="width: 180px;"
-                        >
-                            <option
-                                v-for="semestre in semestres"
-                                :key="semestre.id"
-                                :value="semestre.nombre"
-                            >
-                                {{ semestre.nombre }}
-                            </option>
-                        </select>
+                    <div class="card border">
+                        <div class="card-body">
+                            <div class="d-flex flex-wrap align-items-center gap-2">
+                                <label for="semestre" class="fw-bold mb-0">
+                                    Semestre:
+                                </label>
+
+                                <select
+                                    id="semestre"
+                                    v-model="semestreSeleccionado"
+                                    @change="obtenerResumenPagos"
+                                    class="form-select"
+                                    style="width: 240px;"
+                                    :disabled="cargandoSemestres"
+                                >
+                                    <option :value="null" disabled>
+                                        Seleccione un semestre
+                                    </option>
+
+                                    <option
+                                        v-for="semestre in semestres"
+                                        :key="semestre.id"
+                                        :value="semestre.periodo"
+                                    >
+                                        {{ semestre.nombre }}
+                                        <span v-if="semestre.anio"> - {{ semestre.anio }}</span>
+                                    </option>
+                                </select>
+
+                                <span v-if="cargandoResumen" class="text-muted small">
+                                    Cargando resumen...
+                                </span>
+                            </div>
+                        </div>
                     </div>
                 </div>
-                -->
 
                 <!-- TOTAL DEUDA -->
                 <div class="col-md-4 mb-3">
@@ -205,14 +219,13 @@ export default {
             respaldos: [],
             semestres: [],
             semestreSeleccionado: null,
+            cargandoSemestres: false,
+            cargandoResumen: false,
 
             resumen: {
                 total_deuda: 0,
                 total_pagado: 0,
                 total_pendiente: 0,
-                estudiantes: 0,
-                estudiantes_pagaron: 0,
-                estudiantes_pendientes: 0,
             },
 
             pagination: {
@@ -393,6 +406,12 @@ export default {
         },
 
         async obtenerResumenPagos() {
+            if (this.semestreSeleccionado === null || this.semestreSeleccionado === '') {
+                return
+            }
+
+            this.cargandoResumen = true
+
             try {
                 const res = await axios.get('/dashboard/resumen-pagos', {
                     params: {
@@ -406,23 +425,46 @@ export default {
                 }
             } catch (error) {
                 console.error('Error obteniendo resumen de pagos:', error)
+                this.resumen = {
+                    total_deuda: 0,
+                    total_pagado: 0,
+                    total_pendiente: 0,
+                }
+            } finally {
+                this.cargandoResumen = false
             }
         },
 
         async obtenerSemestres() {
+            this.cargandoSemestres = true
+
             try {
                 const res = await axios.get('/dashboard/semestres')
                 this.semestres = Array.isArray(res.data) ? res.data : []
 
                 if (this.semestres.length > 0) {
-                    this.semestreSeleccionado = this.semestres[0].nombre
+                    // asignaturas.semestre utiliza el valor numérico del periodo.
+                    this.semestreSeleccionado = this.semestres[0].periodo
+                    await this.obtenerResumenPagos()
+                } else {
+                    this.semestreSeleccionado = null
+                    this.resumen = {
+                        total_deuda: 0,
+                        total_pagado: 0,
+                        total_pendiente: 0,
+                    }
                 }
-
-                await this.obtenerResumenPagos()
             } catch (error) {
                 console.error('Error obteniendo semestres:', error)
                 this.semestres = []
-                await this.obtenerResumenPagos()
+                this.semestreSeleccionado = null
+                this.resumen = {
+                    total_deuda: 0,
+                    total_pagado: 0,
+                    total_pendiente: 0,
+                }
+            } finally {
+                this.cargandoSemestres = false
             }
         },
     },
