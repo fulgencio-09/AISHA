@@ -1,0 +1,75 @@
+name: Actualizar crédito con saldo restante
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  fix:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Aplicar actualización del saldo del crédito
+        shell: python
+        run: |
+          from pathlib import Path
+
+          path = Path('resources/js/vue/components/Abonos/index.vue')
+          text = path.read_text(encoding='utf-8')
+
+          old = '''                        this.pagos = res.data;
+                        // console.table(this.pagos)
+                        this.asignatura_id = '';
+                        // Se conserva el crédito mostrado después de guardar el pago.
+                        this.fechas = '';
+                        this.cantidad = '';
+                        this.movimiento = '';
+                        this.deuda = '';
+                        this.formapago = '';
+                        this.estado = '';
+                        pagado.hidden = false'''
+
+          new = '''                        this.pagos = res.data;
+                        // El backend devuelve la deuda/saldo restante de la matrícula.
+                        // El campo Crédito debe mostrar inmediatamente ese nuevo saldo.
+                        const saldoRestante = Number(res.data?.input?.deuda ?? this.deuda) || 0;
+                        this.creditoSeleccionado = saldoRestante;
+                        this.deuda = saldoRestante;
+                        this.asignatura_id = '';
+                        this.fechas = '';
+                        this.cantidad = '';
+                        this.movimiento = '';
+                        this.formapago = '';
+                        this.estado = '';
+                        pagado.hidden = false'''
+
+          if old not in text:
+              raise SystemExit('No se encontró el bloque esperado de guardar abono')
+
+          text = text.replace(old, new, 1)
+          path.write_text(text, encoding='utf-8', newline='')
+
+      - name: Verificar cambio
+        shell: bash
+        run: |
+          git diff --check
+          grep -q 'saldoRestante' resources/js/vue/components/Abonos/index.vue
+          grep -q 'res.data?.input?.deuda' resources/js/vue/components/Abonos/index.vue
+
+      - name: Confirmar y retirar workflow temporal
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          rm -f .github/workflows/fix-abono-credit-balance.yml
+          git add resources/js/vue/components/Abonos/index.vue .github/workflows/fix-abono-credit-balance.yml
+          git commit -m "Actualizar crédito con saldo restante al guardar abono"
+          git push origin main
