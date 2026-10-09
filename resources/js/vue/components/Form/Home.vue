@@ -1,7 +1,7 @@
 <template>
-    <main v-if="esAdmin" class="main" id="main">
+    <main class="main" id="main">
         <div class="container-fluid">
-            <!-- GRÁFICA DE MATRICULADOS -->
+            <!-- GRÁFICA DE MATRICULADOS: visible para todos los usuarios autenticados -->
             <div class="row">
                 <div class="col-12">
                     <div class="card border">
@@ -24,83 +24,85 @@
                 </div>
             </div>
 
-            <!-- RESUMEN DE PAGOS -->
-            <div class="row mt-3">
-                <div class="col-12 mb-3">
-                    <div class="card border">
-                        <div class="card-body">
-                            <div class="d-flex flex-wrap align-items-center gap-2">
-                                <label for="semestre" class="fw-bold mb-0">
-                                    Semestre:
-                                </label>
+            <!-- RESUMEN DE PAGOS: únicamente para administradores -->
+            <template v-if="esAdmin">
+                <div class="row mt-3">
+                    <div class="col-12 mb-3">
+                        <div class="card border">
+                            <div class="card-body">
+                                <div class="d-flex flex-wrap align-items-center gap-2">
+                                    <label for="semestre" class="fw-bold mb-0">
+                                        Semestre:
+                                    </label>
 
-                                <select
-                                    id="semestre"
-                                    v-model="semestreSeleccionado"
-                                    @change="obtenerResumenPagos"
-                                    class="form-select"
-                                    style="width: 240px;"
-                                    :disabled="cargandoSemestres"
-                                >
-                                    <option :value="null" disabled>
-                                        Seleccione un semestre
-                                    </option>
-
-                                    <option
-                                        v-for="semestre in semestres"
-                                        :key="semestre.id"
-                                        :value="semestre.periodo"
+                                    <select
+                                        id="semestre"
+                                        v-model="semestreSeleccionado"
+                                        @change="obtenerResumenPagos"
+                                        class="form-select"
+                                        style="width: 240px;"
+                                        :disabled="cargandoSemestres"
                                     >
-                                        {{ semestre.nombre }}<template v-if="semestre.anio"> - {{ semestre.anio }}</template>
-                                    </option>
-                                </select>
+                                        <option :value="null" disabled>
+                                            Seleccione un semestre
+                                        </option>
 
-                                <span v-if="cargandoResumen" class="text-muted small">
-                                    Cargando resumen...
-                                </span>
+                                        <option
+                                            v-for="semestre in semestres"
+                                            :key="semestre.id"
+                                            :value="semestre.periodo"
+                                        >
+                                            {{ semestre.nombre }}<template v-if="semestre.anio"> - {{ semestre.anio }}</template>
+                                        </option>
+                                    </select>
+
+                                    <span v-if="cargandoResumen" class="text-muted small">
+                                        Cargando resumen...
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- TOTAL DEUDA -->
+                    <div class="col-md-4 mb-3">
+                        <div class="card border">
+                            <div class="card-body text-center">
+                                <h6 class="text-muted">TOTAL DEUDA</h6>
+                                <h3 class="fw-bold">
+                                    $ {{ formatoMoneda(resumen.total_deuda) }}
+                                </h3>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- TOTAL PAGADO -->
+                    <div class="col-md-4 mb-3">
+                        <div class="card border">
+                            <div class="card-body text-center">
+                                <h6 class="text-muted">TOTAL PAGADO</h6>
+                                <h3 class="fw-bold">
+                                    $ {{ formatoMoneda(resumen.total_pagado) }}
+                                </h3>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- TOTAL PENDIENTE -->
+                    <div class="col-md-4 mb-3">
+                        <div class="card border">
+                            <div class="card-body text-center">
+                                <h6 class="text-muted">TOTAL PENDIENTE</h6>
+                                <h3 class="fw-bold">
+                                    $ {{ formatoMoneda(resumen.total_pendiente) }}
+                                </h3>
                             </div>
                         </div>
                     </div>
                 </div>
+            </template>
 
-                <!-- TOTAL DEUDA -->
-                <div class="col-md-4 mb-3">
-                    <div class="card border">
-                        <div class="card-body text-center">
-                            <h6 class="text-muted">TOTAL DEUDA</h6>
-                            <h3 class="fw-bold">
-                                $ {{ formatoMoneda(resumen.total_deuda) }}
-                            </h3>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- TOTAL PAGADO -->
-                <div class="col-md-4 mb-3">
-                    <div class="card border">
-                        <div class="card-body text-center">
-                            <h6 class="text-muted">TOTAL PAGADO</h6>
-                            <h3 class="fw-bold">
-                                $ {{ formatoMoneda(resumen.total_pagado) }}
-                            </h3>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- TOTAL PENDIENTE -->
-                <div class="col-md-4 mb-3">
-                    <div class="card border">
-                        <div class="card-body text-center">
-                            <h6 class="text-muted">TOTAL PENDIENTE</h6>
-                            <h3 class="fw-bold">
-                                $ {{ formatoMoneda(resumen.total_pendiente) }}
-                            </h3>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- LOG DEL APLICATIVO -->
+            <!-- LOG DEL APLICATIVO: visible para todos los usuarios autenticados -->
             <div class="row mt-2">
                 <div class="col-12">
                     <div class="card">
@@ -334,13 +336,14 @@ export default {
     },
 
     mounted() {
-        if (!this.esAdmin) {
-            return
-        }
-
+        // La gráfica y el log son públicos para cualquier usuario autenticado.
         this.obtenerMatriculados()
         this.obtenerRespaldos(1)
-        this.obtenerSemestres()
+
+        // Los datos financieros y el selector de semestre son exclusivos de Admin.
+        if (this.esAdmin) {
+            this.obtenerSemestres()
+        }
     },
 
     methods: {
@@ -450,7 +453,6 @@ export default {
                 this.semestres = Array.isArray(res.data) ? res.data : []
 
                 if (this.semestres.length > 0) {
-                    // asignaturas.semestre utiliza el valor numérico del periodo.
                     this.semestreSeleccionado = this.semestres[0].periodo
                     await this.obtenerResumenPagos()
                 } else {
