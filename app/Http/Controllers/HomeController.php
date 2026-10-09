@@ -72,6 +72,36 @@ class HomeController extends Controller
         return response()->json($resultado);
     }
 
+    /**
+     * Semestres disponibles para el filtro financiero del dashboard.
+     *
+     * Se obtienen directamente de asignaturas porque ese es el campo que
+     * realmente utiliza el resumen de pagos para filtrar. Así el dashboard
+     * no depende de que la tabla periodos tenga registros activos.
+     */
+    public function semestres()
+    {
+        $periodos = DB::table('asignaturas')
+            ->whereNotNull('semestre')
+            ->where('semestre', '!=', '')
+            ->select('semestre')
+            ->distinct()
+            ->orderBy('semestre')
+            ->get();
+
+        $resultado = $periodos->map(function ($periodo) {
+            $valor = (string) $periodo->semestre;
+
+            return [
+                'id' => $valor,
+                'periodo' => $valor,
+                'nombre' => 'Semestre ' . $valor,
+            ];
+        })->values();
+
+        return response()->json($resultado);
+    }
+
     public function log()
     {
         $respaldos = Respaldo::with('user')
@@ -93,8 +123,8 @@ class HomeController extends Controller
 
     public function resumenPagos(Request $request)
     {
-        // El filtro es opcional: si no se envía semestre,
-        // el dashboard conserva el comportamiento de mostrar todos los registros.
+        // El filtro es obligatorio para el dashboard: se selecciona desde
+        // la lista de semestres obtenida de asignaturas.
         $semestre = $request->filled('semestre')
             ? trim((string) $request->input('semestre'))
             : null;
