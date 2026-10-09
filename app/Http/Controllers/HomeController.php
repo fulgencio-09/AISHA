@@ -28,15 +28,15 @@ class HomeController extends Controller
         return view('home');
     }
 
-    //Dashboard
+    // Dashboard
     public function matriculados()
     {
         $matriculados = DB::table('asignaturas as a')
             ->join('estudiantes as e', 'e.id', '=', 'a.estudiante_id')
             ->selectRaw("
-            MONTH(a.created_at) AS mes_numero,
-            COUNT(DISTINCT a.estudiante_id) AS cantidad
-        ")
+                MONTH(a.created_at) AS mes_numero,
+                COUNT(DISTINCT a.estudiante_id) AS cantidad
+            ")
             ->whereYear('a.created_at', now()->year)
             ->groupByRaw('MONTH(a.created_at)')
             ->orderByRaw('MONTH(a.created_at)')
@@ -60,27 +60,22 @@ class HomeController extends Controller
         $resultado = [];
 
         foreach ($meses as $numero => $nombre) {
-
-            $registro = $matriculados->firstWhere(
-                'mes_numero',
-                $numero
-            );
+            $registro = $matriculados->firstWhere('mes_numero', $numero);
 
             $resultado[] = [
                 'mes_numero' => $numero,
                 'mes' => $nombre,
-                'cantidad' => $registro
-                    ? (int) $registro->cantidad
-                    : 0,
+                'cantidad' => $registro ? (int) $registro->cantidad : 0,
             ];
         }
 
         return response()->json($resultado);
     }
+
     public function log()
     {
         $respaldos = Respaldo::with('user')
-            ->orderBy('created_at', 'desc')
+            ->orderByDesc('created_at')
             ->paginate(5);
 
         return [
@@ -92,38 +87,51 @@ class HomeController extends Controller
                 'from' => $respaldos->firstItem(),
                 'to' => $respaldos->lastItem(),
             ],
-
             'respaldos' => $respaldos->items(),
         ];
     }
+
     public function resumenPagos(Request $request)
     {
-        $semestre = $request->semestre;
+        // El filtro es opcional: si no se envía semestre,
+        // el dashboard conserva el comportamiento de mostrar todos los registros.
+        $semestre = $request->filled('semestre')
+            ? trim((string) $request->input('semestre'))
+            : null;
 
         // TOTAL DEUDA Y PENDIENTE
-        $asignaturas = DB::table('asignaturas')
-            //->where('semestre', $semestre)
+        $asignaturasQuery = DB::table('asignaturas');
+
+        if ($semestre !== null && $semestre !== '') {
+            $asignaturasQuery->where('semestre', $semestre);
+        }
+
+        $asignaturas = $asignaturasQuery
             ->selectRaw('
-            COALESCE(SUM(total), 0) AS total_deuda,
-            COALESCE(SUM(valor), 0) AS total_pendiente
-        ')
+                COALESCE(SUM(total), 0) AS total_deuda,
+                COALESCE(SUM(valor), 0) AS total_pendiente
+            ')
             ->first();
 
         // TOTAL PAGADO
-        $totalPagado = DB::table('abonos')
+        $abonosQuery = DB::table('abonos')
             ->join(
                 'asignaturas',
                 'asignaturas.id',
                 '=',
                 'abonos.asignatura_id'
-            )
-           // ->where('asignaturas.semestre', $semestre)
-            ->sum('abonos.cantidad');
+            );
+
+        if ($semestre !== null && $semestre !== '') {
+            $abonosQuery->where('asignaturas.semestre', $semestre);
+        }
+
+        $totalPagado = $abonosQuery->sum('abonos.cantidad');
 
         return [
-            'total_deuda' => $asignaturas->total_deuda,
-            'total_pagado' => $totalPagado,
-            'total_pendiente' => $asignaturas->total_pendiente,
+            'total_deuda' => (float) ($asignaturas->total_deuda ?? 0),
+            'total_pagado' => (float) $totalPagado,
+            'total_pendiente' => (float) ($asignaturas->total_pendiente ?? 0),
         ];
     }
 }
