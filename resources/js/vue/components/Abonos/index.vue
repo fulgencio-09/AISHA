@@ -10,9 +10,11 @@
                             <table class="table table-bordered">
                                 <thead>
                                     <tr>
-                                        <th>documento</th>
+                                        <th>Documento</th>
                                         <th>Nombre</th>
                                         <th>Sede</th>
+                                        <th>Año</th>
+                                        <th>Período</th>
                                         <th>Semestre</th>
                                         <th>Pendiente</th>
                                         <th>Estado</th>
@@ -41,6 +43,8 @@
                                         <th>{{ item.documento }}</th>
                                         <th>{{ item.name }}</th>
                                         <th>{{ item.sede }}</th>
+                                        <th>{{ item.año }}</th>
+                                        <th>{{ item.periodo }}</th>
                                         <th v-if="item.semestre == 1">Introductorio</th>
                                         <th v-else-if="item.semestre == 2">Primer semestre</th>
                                         <th v-else-if="item.semestre == 3">Segundo semestre</th>
@@ -121,17 +125,30 @@
                             <div class="modal-body border p-2">
                                 <div class="row">
 
-                                    <div class="col-14 col-sm-3 input-group-sm">
-                                        <label for="nameWithTitle" class="form-label">Credito</label>
+                                    <div class="col-12 col-sm-3 input-group-sm">
+                                        <label class="form-label">Año</label>
+                                        <input type="text" class="form-control" :value="año" readonly>
+                                    </div>
+
+                                    <div class="col-12 col-sm-3 input-group-sm">
+                                        <label class="form-label">Período</label>
+                                        <input type="text" class="form-control" :value="periodo" readonly>
+                                    </div>
+
+                                    <div class="col-12 col-sm-3 input-group-sm">
+                                        <label class="form-label">Semestre</label>
+                                        <input type="text" class="form-control" :value="nombreSemestre" readonly>
+                                    </div>
+
+                                    <div class="col-12 col-sm-3 input-group-sm">
+                                        <label class="form-label">Crédito</label>
                                         <select v-model="asignatura_id" class="form-select" id="estad"
-                                            aria-label="Multiple select example">
+                                            aria-label="Crédito">
                                             <option value="">Seleccione</option>
-                                            <option v-for="itemb in cred" :key="itemb.id" :value="itemb.id"
-                                                v-text="itemb.valor">
-                                            </option>>
-
+                                            <option v-for="itemb in cred" :key="itemb.id" :value="itemb.id">
+                                                {{ formatoCOP(itemb.valor) }}
+                                            </option>
                                         </select>
-
                                     </div>
 
 
@@ -535,6 +552,16 @@ export default {
                 ? '$ ' + new Intl.NumberFormat('es-CO').format(this.cantidad)
                 : ''
         },
+        nombreSemestre() {
+            const semestres = {
+                1: 'Introductorio',
+                2: 'Primer semestre',
+                3: 'Segundo semestre',
+                4: 'Tercer semestre',
+                5: 'Cuarto semestre'
+            };
+            return semestres[this.semestre] || 'Semestre no válido';
+        },
         isActived: function () {
             return this.pagination.current_page;
         },
@@ -810,7 +837,7 @@ export default {
                     this.fechas = '';
                     this.cantidad = '';
                     this.año = '';
-                    periodo = "";
+                    this.periodo = '';
                     this.movimiento = '';
                     this.formapago = '';
                     this.asignatura_id = '';
@@ -880,6 +907,9 @@ export default {
                         this.name = this.cred[0].name; // lo guardas en el input
                         this.documento = this.cred[0].documento;
                         this.deuda = this.cred[0].valor;
+                        this.año = this.cred[0].año;
+                        this.ano = this.cred[0].año;
+                        this.periodo = this.cred[0].periodo;
                         this.semestre = this.cred[0].semestre;
                         this.telefono = this.cred[0].telefono;
                     } else {
@@ -935,6 +965,7 @@ export default {
             axios.post('/abono/pdf', {
                 id: this.id,
                 año: this.año,
+                periodo: this.periodo,
                 asignatura_id: this.asignatura_id,
             })
                 .then((res) => {
@@ -1124,6 +1155,7 @@ export default {
 
             this.id = datos.id;
             this.año = datos.año;
+            this.periodo = datos.periodo;
             this.report()
 
         }
