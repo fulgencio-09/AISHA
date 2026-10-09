@@ -1,0 +1,91 @@
+name: Actualizar Abonos
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Aplicar cambios de Abonos
+        shell: python
+        run: |
+          from pathlib import Path
+
+          path = Path('resources/js/vue/components/Abonos/index.vue')
+          text = path.read_text(encoding='utf-8')
+          original = text
+
+          replacements = [
+              (
+                  '''<th>documento</th>\n                                        <th>Nombre</th>\n                                        <th>Sede</th>\n                                        <th>Semestre</th>\n                                        <th>Pendiente</th>''',
+                  '''<th>Documento</th>\n                                        <th>Nombre</th>\n                                        <th>Sede</th>\n                                        <th>Año</th>\n                                        <th>Período</th>\n                                        <th>Semestre</th>\n                                        <th>Pendiente</th>'''
+              ),
+              (
+                  '''<th>{{ item.documento }}</th>\n                                        <th>{{ item.name }}</th>\n                                        <th>{{ item.sede }}</th>\n                                        <th v-if="item.semestre == 1">Introductorio</th>''',
+                  '''<th>{{ item.documento }}</th>\n                                        <th>{{ item.name }}</th>\n                                        <th>{{ item.sede }}</th>\n                                        <th>{{ item.año }}</th>\n                                        <th>{{ item.periodo }}</th>\n                                        <th v-if="item.semestre == 1">Introductorio</th>'''
+              ),
+              (
+                  '''<div class="col-14 col-sm-3 input-group-sm">\n                                        <label for="nameWithTitle" class="form-label">Credito</label>\n                                        <select v-model="asignatura_id" class="form-select" id="estad"\n                                            aria-label="Multiple select example">\n                                            <option value="">Seleccione</option>\n                                            <option v-for="itemb in cred" :key="itemb.id" :value="itemb.id"\n                                                v-text="itemb.valor">\n                                            </option>>\n\n                                        </select>\n\n                                    </div>''',
+                  '''<div class="col-12 col-sm-3 input-group-sm">\n                                        <label class="form-label">Año</label>\n                                        <input type="text" class="form-control" :value="año" readonly>\n                                    </div>\n\n                                    <div class="col-12 col-sm-3 input-group-sm">\n                                        <label class="form-label">Período</label>\n                                        <input type="text" class="form-control" :value="periodo" readonly>\n                                    </div>\n\n                                    <div class="col-12 col-sm-3 input-group-sm">\n                                        <label class="form-label">Semestre</label>\n                                        <input type="text" class="form-control" :value="nombreSemestre" readonly>\n                                    </div>\n\n                                    <div class="col-12 col-sm-3 input-group-sm">\n                                        <label class="form-label">Crédito</label>\n                                        <select v-model="asignatura_id" class="form-select" id="estad"\n                                            aria-label="Crédito">\n                                            <option value="">Seleccione</option>\n                                            <option v-for="itemb in cred" :key="itemb.id" :value="itemb.id">\n                                                {{ formatoCOP(itemb.valor) }}\n                                            </option>\n                                        </select>\n                                    </div>'''
+              ),
+              (
+                  '''        precioFormateado() {\n            return this.cantidad > 0\n                ? '$ ' + new Intl.NumberFormat('es-CO').format(this.cantidad)\n                : ''\n        },''',
+                  '''        precioFormateado() {\n            return this.cantidad > 0\n                ? '$ ' + new Intl.NumberFormat('es-CO').format(this.cantidad)\n                : ''\n        },\n        nombreSemestre() {\n            const semestres = {\n                1: 'Introductorio',\n                2: 'Primer semestre',\n                3: 'Segundo semestre',\n                4: 'Tercer semestre',\n                5: 'Cuarto semestre'\n            };\n            return semestres[this.semestre] || 'Semestre no válido';\n        },'''
+              ),
+              (
+                  '''                        this.deuda = this.cred[0].valor;\n                        this.semestre = this.cred[0].semestre;\n                        this.telefono = this.cred[0].telefono;''',
+                  '''                        this.deuda = this.cred[0].valor;\n                        this.año = this.cred[0].año;\n                        this.ano = this.cred[0].año;\n                        this.periodo = this.cred[0].periodo;\n                        this.semestre = this.cred[0].semestre;\n                        this.telefono = this.cred[0].telefono;'''
+              ),
+              (
+                  '''                id: this.id,\n                año: this.año,\n                asignatura_id: this.asignatura_id,''',
+                  '''                id: this.id,\n                año: this.año,\n                periodo: this.periodo,\n                asignatura_id: this.asignatura_id,'''
+              ),
+              (
+                  '''        reporte(datos) {\n\n            this.id = datos.id;\n            this.año = datos.año;\n            this.report()''',
+                  '''        reporte(datos) {\n\n            this.id = datos.id;\n            this.año = datos.año;\n            this.periodo = datos.periodo;\n            this.report()'''
+              ),
+              (
+                  '''                    this.año = '';\n                    periodo = "";''',
+                  '''                    this.año = '';\n                    this.periodo = '';'''
+              ),
+          ]
+
+          for old, new in replacements:
+              if old not in text:
+                  raise SystemExit(f'No se encontró el bloque esperado: {old[:80]!r}')
+              text = text.replace(old, new, 1)
+
+          if text == original:
+              raise SystemExit('No se realizaron cambios')
+
+          path.write_text(text, encoding='utf-8', newline='')
+
+      - name: Verificar cambios
+        shell: bash
+        run: |
+          git diff --check
+          grep -q '<th>Año</th>' resources/js/vue/components/Abonos/index.vue
+          grep -q '<th>Período</th>' resources/js/vue/components/Abonos/index.vue
+          grep -q 'nombreSemestre()' resources/js/vue/components/Abonos/index.vue
+          grep -q 'periodo: this.periodo' resources/js/vue/components/Abonos/index.vue
+
+      - name: Confirmar cambios y retirar workflow temporal
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          rm -f .github/workflows/patch-abonos.yml
+          git add resources/js/vue/components/Abonos/index.vue .github/workflows/patch-abonos.yml
+          git commit -m "Actualizar contexto académico en Abonos"
+          git push origin main
