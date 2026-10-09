@@ -1081,6 +1081,10 @@ export default {
                     if (res.data != 'no') {
                         toastr.success('Se abonó exitosamente');
                         this.pagos = res.data;
+                        // Mostrar en Crédito el saldo restante devuelto por el backend.
+                        const saldoRestante = Number(res.data?.input?.deuda ?? this.deuda) || 0;
+                        this.creditoSeleccionado = saldoRestante;
+                        this.deuda = saldoRestante;
                         // console.table(this.pagos)
                         this.asignatura_id = '';
                         // Se conserva el crédito mostrado después de guardar el pago.
