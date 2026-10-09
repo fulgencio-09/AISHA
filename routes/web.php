@@ -61,12 +61,12 @@ Route::get('/relacion', [App\Http\Controllers\Reporte::class, 'show'])->name('ex
 
 Route::post('/enviar', [App\Http\Controllers\CorreoController::class, 'enviar']);
 
-// Dashboard: la gráfica y el log son visibles para usuarios autenticados.
+// Gráfica de matriculados: visible para cualquier usuario autenticado.
 Route::get('/dashboard/matriculados-mes', [App\Http\Controllers\HomeController::class, 'matriculados'])->name('matriculados');
-Route::get('/respaldos', [App\Http\Controllers\HomeController::class, 'log'])->name('log');
 
-// Resumen financiero: únicamente usuarios administrativos.
+// Log y resumen financiero: únicamente usuarios administrativos.
 Route::middleware('admin')->group(function(){
+    Route::get('/respaldos', [App\Http\Controllers\HomeController::class, 'log'])->name('log');
     Route::get('/dashboard/resumen-pagos', [App\Http\Controllers\HomeController::class, 'resumenPagos']);
     Route::get('/dashboard/semestres', [App\Http\Controllers\Periodos::class, 'semestres']);
 });
