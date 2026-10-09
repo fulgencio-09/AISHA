@@ -49,8 +49,6 @@ class Kernel extends HttpKernel
     /**
      * The application's route middleware.
      *
-     * These middleware may be assigned to groups or used individually.
-     *
      * @var array<string, class-string|string>
      */
     protected $routeMiddleware = [
@@ -64,8 +62,9 @@ class Kernel extends HttpKernel
         'throttle' => \Illuminate\Routing\Middleware\ThrottleRequests::class,
         'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
         'role' => \Spatie\Permission\Middlewares\RoleMiddleware::class,
-       'permission' => \Spatie\Permission\Middlewares\PermissionMiddleware::class,
+        'permission' => \Spatie\Permission\Middlewares\PermissionMiddleware::class,
         'role_or_permission' => \Spatie\Permission\Middlewares\RoleOrPermissionMiddleware::class,
-        'checkip' => \App\Http\Middleware\CheckIpAccess::class 
+        'checkip' => \App\Http\Middleware\CheckIpAccess::class,
+        'admin' => \App\Http\Middleware\AdminOnly::class,
     ];
 }
