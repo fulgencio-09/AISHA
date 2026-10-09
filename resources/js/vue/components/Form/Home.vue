@@ -1,5 +1,5 @@
 <template>
-    <main class="main" id="main">
+    <main v-if="esAdmin" class="main" id="main">
         <div class="container-fluid">
             <!-- GRÁFICA DE MATRICULADOS -->
             <div class="row">
@@ -51,8 +51,7 @@
                                         :key="semestre.id"
                                         :value="semestre.periodo"
                                     >
-                                        {{ semestre.nombre }}
-                                        <span v-if="semestre.anio"> - {{ semestre.anio }}</span>
+                                        {{ semestre.nombre }}<template v-if="semestre.anio"> - {{ semestre.anio }}</template>
                                     </option>
                                 </select>
 
@@ -215,7 +214,11 @@ export default {
     },
 
     data() {
+        const adminMeta = document.querySelector('meta[name="is-admin"]')
+
         return {
+            esAdmin: adminMeta?.getAttribute('content') === '1',
+
             respaldos: [],
             semestres: [],
             semestreSeleccionado: null,
@@ -331,6 +334,10 @@ export default {
     },
 
     mounted() {
+        if (!this.esAdmin) {
+            return
+        }
+
         this.obtenerMatriculados()
         this.obtenerRespaldos(1)
         this.obtenerSemestres()
