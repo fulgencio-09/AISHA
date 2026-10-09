@@ -142,13 +142,7 @@
 
                                     <div class="col-12 col-sm-3 input-group-sm">
                                         <label class="form-label">Crédito</label>
-                                        <select v-model="asignatura_id" class="form-select" id="estad"
-                                            aria-label="Crédito" :disabled="!!asignatura_id">
-                                            <option value="">Seleccione</option>
-                                            <option v-for="itemb in cred" :key="itemb.id" :value="itemb.id">
-                                                {{ formatoCOP(itemb.valor) }}
-                                            </option>
-                                        </select>
+                                        <input type="text" class="form-control" :value="creditoFormateado" readonly>
                                     </div>
 
 
@@ -490,6 +484,7 @@ export default {
             estudent: {},
             date: {},
             credito: '',
+            creditoSeleccionado: '',
             deuda: '',
             formapago: '',
             asignatura_id: '',
@@ -551,6 +546,9 @@ export default {
             return this.cantidad > 0
                 ? '$ ' + new Intl.NumberFormat('es-CO').format(this.cantidad)
                 : ''
+        },
+        creditoFormateado() {
+            return this.creditoSeleccionado !== '' ? this.formatoCOP(this.creditoSeleccionado) : '';
         },
         nombreSemestre() {
             const semestres = {
@@ -797,7 +795,6 @@ export default {
                     cuatro.hidden = true
                     cantid.disabled = true
                     fech.disabled = true
-                    estad.disabled = true
                     this.btncrear = false;
                     this.btnedit = false;
                     this.abonos = res.data.abono.data;
@@ -841,6 +838,7 @@ export default {
                     this.movimiento = '';
                     this.formapago = '';
                     this.asignatura_id = '';
+                    this.creditoSeleccionado = '';
 
                     this.isLoading = false
 
@@ -907,6 +905,7 @@ export default {
                         this.name = this.cred[0].name; // lo guardas en el input
                         this.documento = this.cred[0].documento;
                         this.deuda = this.cred[0].valor;
+                        this.creditoSeleccionado = this.cred[0].valor;
                         this.año = this.cred[0].año;
                         this.ano = this.cred[0].año;
                         this.periodo = this.cred[0].periodo;
@@ -1084,6 +1083,7 @@ export default {
                         this.pagos = res.data;
                         // console.table(this.pagos)
                         this.asignatura_id = '';
+                        this.creditoSeleccionado = '';
                         this.fechas = '';
                         this.cantidad = '';
                         this.movimiento = '';
@@ -1122,7 +1122,6 @@ export default {
             this.asignatura_id = '';
             cantid.disabled = false
             fech.disabled = false
-            estad.disabled = false
             this.asignatura_id = datos.asignatura_id;
             this.btncrear = true;
             this.btncancel = true;
@@ -1137,7 +1136,6 @@ export default {
             //console.table(datos) 
             cantid.disabled = false
             fech.disabled = false
-            estad.disabled = false
             this.id = datos.id;
             this.año = datos.año
             this.asignatura_id = datos.asignatura_id
