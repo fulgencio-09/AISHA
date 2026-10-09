@@ -21,19 +21,19 @@ jobs:
         shell: python
         run: |
           from pathlib import Path
+          import re
 
           path = Path('resources/js/vue/components/Abonos/index.vue')
           text = path.read_text(encoding='utf-8')
-          old = '''<select v-model="asignatura_id" class="form-select" id="estad"
-                                            aria-label="Crédito">'''
-          new = '''<select v-model="asignatura_id" class="form-select" id="estad"
-                                            aria-label="Crédito" :disabled="!!asignatura_id">'''
 
-          if old not in text:
-              raise SystemExit('No se encontró el selector de crédito esperado')
+          pattern = r'(<select\s+v-model="asignatura_id"\s+class="form-select"\s+id="estad"\s+aria-label="Crédito")>'
+          replacement = r'\1 :disabled="!!asignatura_id">'
 
-          text = text.replace(old, new, 1)
-          path.write_text(text, encoding='utf-8', newline='')
+          updated, count = re.subn(pattern, replacement, text, count=1)
+          if count != 1:
+              raise SystemExit('No se encontró exactamente el selector de crédito esperado')
+
+          path.write_text(updated, encoding='utf-8', newline='')
 
       - name: Verificar y confirmar
         shell: bash
