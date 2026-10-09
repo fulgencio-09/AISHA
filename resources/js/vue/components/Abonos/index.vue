@@ -143,7 +143,7 @@
                                     <div class="col-12 col-sm-3 input-group-sm">
                                         <label class="form-label">Crédito</label>
                                         <select v-model="asignatura_id" class="form-select" id="estad"
-                                            aria-label="Crédito">
+                                            aria-label="Crédito" :disabled="!!asignatura_id">
                                             <option value="">Seleccione</option>
                                             <option v-for="itemb in cred" :key="itemb.id" :value="itemb.id">
                                                 {{ formatoCOP(itemb.valor) }}
