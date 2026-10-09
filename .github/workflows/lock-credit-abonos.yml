@@ -1,0 +1,48 @@
+name: Bloquear crédito en Abonos
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Bloquear crédito después de seleccionarlo
+        shell: python
+        run: |
+          from pathlib import Path
+
+          path = Path('resources/js/vue/components/Abonos/index.vue')
+          text = path.read_text(encoding='utf-8')
+          old = '''<select v-model="asignatura_id" class="form-select" id="estad"
+                                            aria-label="Crédito">'''
+          new = '''<select v-model="asignatura_id" class="form-select" id="estad"
+                                            aria-label="Crédito" :disabled="!!asignatura_id">'''
+
+          if old not in text:
+              raise SystemExit('No se encontró el selector de crédito esperado')
+
+          text = text.replace(old, new, 1)
+          path.write_text(text, encoding='utf-8', newline='')
+
+      - name: Verificar y confirmar
+        shell: bash
+        run: |
+          git diff --check
+          grep -q ':disabled="!!asignatura_id"' resources/js/vue/components/Abonos/index.vue
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          rm -f .github/workflows/lock-credit-abonos.yml
+          git add resources/js/vue/components/Abonos/index.vue .github/workflows/lock-credit-abonos.yml
+          git commit -m "Bloquear crédito seleccionado en Abonos"
+          git push origin main
