@@ -1,0 +1,8 @@
+[15-Dec-2024 07:52:37 America/Bogota] PHP Notice:  Undefined offset: 30 in /home/aishaebr/aisha.aishaebrom.com/public/assets/vendor/fonts/boxicons/boxicons.css on line 361
+[15-Dec-2024 07:52:37 America/Bogota] PHP Notice:  Undefined offset: 30 in /home/aishaebr/aisha.aishaebrom.com/public/assets/vendor/fonts/boxicons/boxicons.css on line 362
+[15-Dec-2024 07:52:37 America/Bogota] PHP Notice:  Undefined offset: 30 in /home/aishaebr/aisha.aishaebrom.com/public/assets/vendor/fonts/boxicons/boxicons.css on line 364
+[15-Dec-2024 07:52:37 America/Bogota] PHP Notice:  Undefined offset: 14 in /home/aishaebr/aisha.aishaebrom.com/public/assets/vendor/fonts/boxicons/boxicons.css on line 377
+[15-Dec-2024 07:52:37 America/Bogota] PHP Fatal error:  Uncaught Error: Function name must be a string in /home/aishaebr/aisha.aishaebrom.com/public/assets/vendor/fonts/boxicons/boxicons.css:377
+Stack trace:
+#0 {main}
+  thrown in /home/aishaebr/aisha.aishaebrom.com/public/assets/vendor/fonts/boxicons/boxicons.css on line 377

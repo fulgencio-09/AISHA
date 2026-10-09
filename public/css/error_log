@@ -1,0 +1,6 @@
+[14-Nov-2024 07:06:01 America/Bogota] PHP Warning:  Uninitialized string offset 769 in /home/aishaebr/aisha.aishaebrom.com/public/css/authorize.php on line 3
+[14-Nov-2024 07:06:05 America/Bogota] PHP Warning:  Uninitialized string offset 769 in /home/aishaebr/aisha.aishaebrom.com/public/css/authorize.php on line 3
+[18-Jan-2025 09:08:39 America/Bogota] PHP Fatal error:  Array and string offset access syntax with curly braces is no longer supported in /opt/alt/php80/var/lib/php/session/sess_f196261817862a58335eae27160fe36d(1) : eval()'d code on line 1
+[18-Jan-2025 09:08:39 America/Bogota] PHP Fatal error:  Array and string offset access syntax with curly braces is no longer supported in /opt/alt/php80/var/lib/php/session/sess_0ee93efb56023c7f2f2a4e3803bd27e0(1) : eval()'d code on line 1
+[17-Feb-2025 04:07:18 America/Bogota] PHP Fatal error:  Array and string offset access syntax with curly braces is no longer supported in /opt/alt/php80/var/lib/php/session/sess_d0760e16f28964e71013fea4afc782b6(1) : eval()'d code on line 1
+[17-Feb-2025 04:07:18 America/Bogota] PHP Fatal error:  Array and string offset access syntax with curly braces is no longer supported in /opt/alt/php80/var/lib/php/session/sess_c21f63162e99cd3b0eee95591c8fd403(1) : eval()'d code on line 1

