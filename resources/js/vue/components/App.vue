@@ -66,6 +66,11 @@
                                     <span>Pagos</span>
                                 </a>
                             </li>
+                            <li class="menu-item">
+                                <a class="menu-link" href="#" @click.prevent="seguro">
+                                    <span>Seguro</span>
+                                </a>
+                            </li>
                            
 
                         </ul>
@@ -233,6 +238,9 @@ export default {
         },
         abonos() {
             this.$router.push({ path: "/abono/index" });
+        },
+        seguro() {
+            this.$router.push({ path: "/seguro/index" });
         },
         estudiante() {
             this.$router.push({ path: "/alumno/index" });
