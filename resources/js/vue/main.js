@@ -8,7 +8,7 @@ import Home from './components/Form/Home.vue';
 import User from './components/User/index.vue';
 import Edit from './components/User/Edit.vue';
 import Alumno from './components/Alumnos/index.vue';
-import Matricula from './components/Asignaturas/index.vue';
+import Matricula from './components/Asignaturas/MatriculaForm.vue';
 import Abonos from './components/Abonos/index.vue';
 import Seguro from './components/Seguro/index.vue';
 import Notas from './components/Notas/index.vue';
@@ -39,9 +39,6 @@ window.alert = function (message) {
   }
 };
 
-// Capturar automáticamente los mensajes enviados por Laravel en errores HTTP.
-// El import explícito de axios garantiza que el interceptor se registre antes
-// de que los componentes realicen peticiones.
 axios.interceptors.response.use(
   response => response,
   error => {
@@ -57,52 +54,17 @@ axios.interceptors.response.use(
 );
 
 const routes = [
-  {
-    path: '/cambio/password',
-    component: Password,
-  },
-  {
-    path: '/relacion',
-    component: Informe,
-  },
-  {
-    path: '/home',
-    component: Home,
-  },
-  {
-    path: '/user/index',
-    component: User,
-    name: 'usuario'
-  },
-  {
-    path: '/user/:id',
-    component: Edit,
-    name: 'edit'
-  },
-  {
-    path: '/alumno/index',
-    component: Alumno,
-  },
-  {
-    path: '/matricula/:id',
-    component: Matricula,
-  },
-  {
-    path: '/abono/index',
-    component: Abonos,
-  },
-  {
-    path: '/seguro/index',
-    component: Seguro,
-  },
-  {
-    path: '/nota/index',
-    component: Notas,
-  },
-  {
-    path: '/reporte/index',
-    component: Reporte,
-  },
+  { path: '/cambio/password', component: Password },
+  { path: '/relacion', component: Informe },
+  { path: '/home', component: Home },
+  { path: '/user/index', component: User, name: 'usuario' },
+  { path: '/user/:id', component: Edit, name: 'edit' },
+  { path: '/alumno/index', component: Alumno },
+  { path: '/matricula/:id', component: Matricula },
+  { path: '/abono/index', component: Abonos },
+  { path: '/seguro/index', component: Seguro },
+  { path: '/nota/index', component: Notas },
+  { path: '/reporte/index', component: Reporte },
 ];
 
 const router = VueRouter.createRouter({
