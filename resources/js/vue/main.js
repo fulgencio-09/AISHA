@@ -13,6 +13,7 @@ import Abonos from './components/Abonos/index.vue';
 import Seguro from './components/Seguro/index.vue';
 import Notas from './components/Notas/index.vue';
 import Reporte from './components/Reporte/index.vue';
+import Deudas from './components/Reporte/Deudas.vue';
 import Informe from './components/Reporte/relacion.vue';
 import Password from './components/user/contrasena.vue';
 
@@ -65,6 +66,7 @@ const routes = [
   { path: '/seguro/index', component: Seguro },
   { path: '/nota/index', component: Notas },
   { path: '/reporte/index', component: Reporte },
+  { path: '/reporte/deudas', component: Deudas },
 ];
 
 const router = VueRouter.createRouter({
