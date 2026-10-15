@@ -1,3 +1,4 @@
+import axios from 'axios';
 import VueApexCharts from 'vue3-apexcharts'
 import * as Vue from 'vue';
 import App from './components/App.vue';
@@ -39,22 +40,21 @@ window.alert = function (message) {
 };
 
 // Capturar automáticamente los mensajes enviados por Laravel en errores HTTP.
-// Así el mensaje real del backend llega a Toastr aunque el componente use alert().
-if (typeof axios !== 'undefined') {
-  axios.interceptors.response.use(
-    response => response,
-    error => {
-      const data = error?.response?.data;
-      window.__toastrErrorMessage =
-        data?.message ||
-        data?.error ||
-        (typeof data === 'string' ? data : null) ||
-        'No fue posible completar la operación.';
+// El import explícito de axios garantiza que el interceptor se registre antes
+// de que los componentes realicen peticiones.
+axios.interceptors.response.use(
+  response => response,
+  error => {
+    const data = error?.response?.data;
+    window.__toastrErrorMessage =
+      data?.message ||
+      data?.error ||
+      (typeof data === 'string' ? data : null) ||
+      'No fue posible completar la operación.';
 
-      return Promise.reject(error);
-    }
-  );
-}
+    return Promise.reject(error);
+  }
+);
 
 const routes = [
   {
