@@ -1,11 +1,11 @@
 <template>
-    <div class="content-wrapper" v-if="seccion == 'Admin'">
+    <div class="content-wrapper user-admin-page" v-if="seccion == 'Admin'">
         <div class="container-xxl flex-grow-1 container-p-y">
 
             <div class="row">
                 <div class="col-xl-12">
                  
-                    <div class="nav-align-top mb-4 ">
+                    <div class="nav-align-top mb-4 user-tabs">
                         <ul class="nav nav-tabs" id="myTab" role="tablist">
                             <li class="nav-item" role="presentation">
                                 <button class="nav-link active" id="home-tab" data-bs-toggle="tab"
@@ -23,12 +23,8 @@
                         <div class="tab-content" id="myTabContent">
                             <div class="tab-pane fade show active" id="home-tab-pane" role="tabpanel"
                                 aria-labelledby="home-tab" tabindex="0">
-                                <div class="col-sm-12 border mt-2">
-                                    <label style="background-color: tomato;" class="col-md-12 col-12 border"
-                                        align="center">Registro de
-                                        Usuarios</label>
-                                </div>
-                                <div class="tab-pane  show active mt-2 border p-2" id="navs-top-home" role="tabpanel">
+                                <div class="user-section-heading mb-3"><div><h5 class="mb-1"><i class="fa fa-user-plus me-2"></i>Registro de usuarios</h5><p class="mb-0">Crea y configura el acceso de los usuarios al sistema.</p></div></div>
+                                <div class="tab-pane show active user-form-panel" id="navs-top-home" role="tabpanel">
                                     <form v-on:submit.prevent="agregar()" method="POST">
 
                                         <loading v-model:active="isLoading" color="#48FF09" :can-cancel="true"
@@ -107,15 +103,12 @@
                             <div class="tab-pane fade" id="profile-tab-pane" role="tabpanel"
                                 aria-labelledby="profile-tab" tabindex="0">
                                 <div class="tab-pane " id="navs-top-profile" role="tabpanel">
-                                    <div class="col-sm-12 border mt-2">
-                                    <label style="background-color: tomato;" class="col-md-12 col-12 border "
-                                        align="center">Tabla de Registros de Usuarios</label>
-                                </div>
-                                    <div class="card mt-1">
+                                    <div class="user-section-heading mb-3"><div><h5 class="mb-1"><i class="fa fa-users me-2"></i>Usuarios registrados</h5><p class="mb-0">Consulta los usuarios y administra sus permisos.</p></div></div>
+                                    <div class="card border-0 shadow-sm user-table-card">
 
                                         <div class="table-responsive text-nowrap">
-                                            <table class="table table-bordered">
-                                                <thead>
+                                            <table class="table table-hover align-middle mb-0">
+                                                <thead class="table-light">
                                                     <tr>
                                                         <th>Nombres</th>
                                                         <th>Usuario</th>
@@ -350,3 +343,147 @@ export default {
     }
 }
 </script>
+
+
+<style scoped>
+.user-admin-page {
+    padding: 24px;
+    background: #f4f7fb;
+    min-height: calc(100vh - 80px);
+}
+.user-admin-page .container-xxl {
+    max-width: 1440px;
+    padding-top: 0;
+}
+.user-admin-page .nav-tabs {
+    border-bottom: 1px solid #e7ebf2;
+    gap: 6px;
+}
+.user-admin-page .nav-tabs .nav-link {
+    border: 0;
+    border-radius: 10px 10px 0 0;
+    color: #64748b;
+    font-weight: 600;
+    padding: 12px 18px;
+}
+.user-admin-page .nav-tabs .nav-link.active {
+    color: #2563eb;
+    background: #fff;
+    box-shadow: inset 0 3px 0 #2563eb;
+}
+.user-admin-page .tab-content {
+    background: transparent;
+    padding-top: 16px;
+}
+.user-admin-page .tab-pane > .user-section-heading,
+.user-admin-page #navs-top-profile > .user-section-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #fff;
+    border-radius: 12px;
+    padding: 18px 22px;
+    border: 1px solid #e8edf4;
+    box-shadow: 0 2px 8px rgba(15, 23, 42, .04);
+}
+.user-admin-page .user-section-heading h5 {
+    color: #1e293b;
+    font-weight: 700;
+}
+.user-admin-page .user-section-heading p {
+    color: #64748b;
+    font-size: .875rem;
+}
+.user-admin-page .user-form-panel,
+.user-admin-page .user-table-card {
+    background: #fff;
+    border: 1px solid #e8edf4 !important;
+    border-radius: 12px;
+    padding: 22px;
+    box-shadow: 0 4px 14px rgba(15, 23, 42, .05);
+}
+.user-admin-page .form-label {
+    color: #475569;
+    font-size: .78rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .025em;
+    margin-bottom: 7px;
+}
+.user-admin-page .form-control,
+.user-admin-page .form-select {
+    min-height: 40px;
+    border: 1px solid #d9e2ee;
+    border-radius: 8px;
+    color: #334155;
+    box-shadow: none;
+}
+.user-admin-page .form-control:focus,
+.user-admin-page .form-select:focus {
+    border-color: #93b4f7;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, .1);
+}
+.user-admin-page .user-form-panel .row {
+    row-gap: 12px;
+}
+.user-admin-page .btn {
+    border-radius: 8px;
+    font-weight: 600;
+    padding: 9px 15px;
+}
+.user-admin-page .btn-outline-success {
+    color: #15803d;
+    border-color: #86d6a0;
+}
+.user-admin-page .btn-outline-success:hover {
+    color: #fff;
+    background: #16a34a;
+    border-color: #16a34a;
+}
+.user-admin-page .user-table-card {
+    padding: 0;
+    overflow: hidden;
+}
+.user-admin-page .table-responsive {
+    border-radius: 12px;
+}
+.user-admin-page .table {
+    color: #334155;
+}
+.user-admin-page .table thead th {
+    padding: 14px 16px;
+    color: #64748b;
+    font-size: .75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .035em;
+    white-space: nowrap;
+    border-bottom: 1px solid #e8edf4;
+}
+.user-admin-page .table tbody td,
+.user-admin-page .table tbody th {
+    padding: 14px 16px;
+    font-weight: 500;
+    border-color: #edf1f6;
+}
+.user-admin-page .pagination {
+    padding: 16px;
+    margin-bottom: 0;
+}
+.user-admin-page .page-link {
+    border-radius: 7px;
+    margin: 0 2px;
+    color: #2563eb;
+}
+.user-admin-page .page-item.active .page-link {
+    background: #2563eb;
+    border-color: #2563eb;
+    color: #fff;
+}
+@media (max-width: 767.98px) {
+    .user-admin-page { padding: 12px; }
+    .user-admin-page .user-form-panel { padding: 14px; }
+    .user-admin-page .nav-tabs .nav-link { padding: 10px 12px; font-size: .85rem; }
+    .user-admin-page .user-section-heading { padding: 14px; }
+}
+</style>
