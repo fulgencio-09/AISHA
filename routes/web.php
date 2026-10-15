@@ -13,7 +13,6 @@ use App\Http\Controllers\Generar;
 | contains the "web" middleware group. Now create something great!
 */
 
-
 Route::get('/', function () {
     return view('auth.login');
 });
@@ -30,7 +29,6 @@ Route::resource('/user', App\Http\Controllers\Auth\RegisterController::class );
 Route::resource('/alumno', App\Http\Controllers\Estudiante::class );
 Route::resource('/abono', App\Http\Controllers\Abonos::class );
 Route::resource('/nota', App\Http\Controllers\Notas::class );
-
 Route::resource('/matricula', App\Http\Controllers\Asignatura::class );
 Route::get('/users/{id}', [App\Http\Controllers\Auth\RegisterController::class, 'consulta'])->name('users');
 Route::post('/alumno/buscar', [App\Http\Controllers\Estudiante::class,'buscar'])->name('a/personas');
@@ -39,7 +37,6 @@ Route::post('/nota/busca', [App\Http\Controllers\Notas::class, 'busca'])->name('
 Route::post('/notas/guardar', [App\Http\Controllers\Notas::class, 'store'])->name('n/personas');
 Route::post('/agregar/materia', [App\Http\Controllers\Notas::class, 'agregarnotas'])->name('n/personas');
 Route::get('/periodos', [App\Http\Controllers\Notas::class, 'periodo'])->name('n/personas');
-//Route::put('/notes/{$id}', [App\Http\Controllers\Notas::class, 'update'])->name('nota/list');
 Route::post('/asignatura/buscar', [App\Http\Controllers\Asignatura::class, 'buscar'])->name('as/personas');
 Route::post('/abono/buscar', [App\Http\Controllers\Abonos::class, 'buscar'])->name('ab/personas');
 Route::post('/notas/buscar', [App\Http\Controllers\Notas::class, 'busca'])->name('ab/personas');
@@ -48,16 +45,22 @@ Route::post('/abono/list', [App\Http\Controllers\Abonos::class, 'create'])->name
 Route::post('/facturas', [App\Http\Controllers\Abonos::class, 'factura'])->name('abj/personas');
 Route::get('/abono/credito/{id}', [App\Http\Controllers\Abonos::class, 'credito'])->name('abj/personas');
 Route::get('/abono/eliminar/{id}/{user_id}', [App\Http\Controllers\Abonos::class, 'eliminar'])->name('abj/personas');
+
+// Informe de deudas: solo administración.
+Route::middleware('admin')->group(function(){
+    Route::get('/reporte/deudas/anos', [App\Http\Controllers\Reporte::class, 'anosDeudas'])->name('reporte.deudas.anos');
+    Route::get('/reporte/deudas/xlsx', [App\Http\Controllers\Reporte::class, 'deudasExcel'])->name('reporte.deudas.xlsx');
+    Route::get('/reporte/deudas', [App\Http\Controllers\Reporte::class, 'deudas'])->name('reporte.deudas');
+});
+
 Route::resource('/reporte', App\Http\Controllers\Reporte::class );
 Route::post('/reporte/busca', [App\Http\Controllers\Reporte::class, 'buscar'])->name('abj/personas');
 Route::post('/abono/pdf', [App\Http\Controllers\Reporte::class, 'reporte'])->name('abj/personas');
 Route::get('/cerrar/{id}', [App\Http\Controllers\Reporte::class, 'cerrar'])->name('as/personas');
-//Route::get('/notas/{id}', [App\Http\Controllers\Reporte::class, 'notas'])->name('as/personas');
 Route::get('/abrir/{id}', [App\Http\Controllers\Reporte::class, 'abrir'])->name('as/personas');
 Route::post('/exportar', [App\Http\Controllers\Reporte::class, 'listadomatriculado'])->name('exportar.listado');
 Route::post('/exportar_', [App\Http\Controllers\Reporte::class, 'listado'])->name('exportar.listado');
 Route::get('/relacion', [App\Http\Controllers\Reporte::class, 'show'])->name('exportar.listado');
-// routes/api.php
 
 Route::post('/enviar', [App\Http\Controllers\CorreoController::class, 'enviar']);
 
@@ -72,12 +75,10 @@ Route::middleware('admin')->group(function(){
 });
 
 // Ruta del shell de Vue: permite entrar o refrescar directamente /seguro/index.
-// Debe estar antes del resource porque /seguro/{seguro} interpretaría "index" como un ID.
 Route::get('/seguro/index', [App\Http\Controllers\HomeController::class, 'index'])->name('seguro.frontend');
 
 // Seguro estudiantil: consulta, registro y pago único.
 Route::resource('/seguro', App\Http\Controllers\Seguro::class)->only(['index', 'store', 'show']);
 Route::post('/seguro/{id}/pagar', [App\Http\Controllers\Seguro::class, 'pagar'])->name('seguro.pagar');
-
 
 });
