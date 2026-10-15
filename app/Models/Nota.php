@@ -7,17 +7,23 @@ use Illuminate\Database\Eloquent\Model;
 
 class Nota extends Model
 {
+    use HasFactory;
+
     protected $fillable = [
+        'user_id',
         'semestre',
         'materia',
+        'materia_id',
         'materias_id',
         'asignatura_id',
         'corte1',
         'corte2',
         'corte3',
-        'habilitada_recuperacion'
+        'habilitada_recuperacion',
+        'matriculado_en',
     ];
+
     protected $casts = [
-        'habilitada_recuperacion' => 'boolean'
+        'habilitada_recuperacion' => 'boolean',
     ];
 }
