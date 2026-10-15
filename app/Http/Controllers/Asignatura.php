@@ -214,9 +214,10 @@ class Asignatura extends Controller
             $seguroValor = $validated['seguro_valor'];
             unset($validated['seguro_valor']);
 
-            // La tabla asignaturas exige user_id. Se registra el usuario autenticado
-            // que realiza la matrícula para conservar la trazabilidad existente.
+            // La matrícula queda activa desde su creación y se registra el usuario
+            // autenticado que realizó la matrícula para conservar la trazabilidad.
             $validated['user_id'] = Auth::id();
+            $validated['estado'] = 1;
 
             $asignatura = ModelsAsignatura::create($validated);
 
