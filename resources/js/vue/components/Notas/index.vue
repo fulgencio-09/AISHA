@@ -3,7 +3,7 @@
         <div class="container-fluid py-3">
 
             <!-- LISTADO DE MATRICULADOS -->
-            <section class="notas-card" id="listado">
+            <section class="notas-card" id="listado" v-show="vista === 'listado'">
                 <div class="section-title">Matriculados</div>
 
                 <div class="table-responsive">
@@ -75,7 +75,7 @@
             </section>
 
             <!-- GESTION DE NOTAS -->
-            <section class="notas-card gestion-card" id="dos">
+            <section class="notas-card gestion-card" id="dos" v-show="vista === 'gestion'">
                 <div class="section-title">Gestión de Notas</div>
 
                 <form @submit.prevent="guardarNota">
@@ -83,7 +83,7 @@
                         <div class="row g-3">
                             <div class="col-12 col-md-4">
                                 <label class="field-label">MATERIA</label>
-                                <input type="text" v-model="form.materia" class="form-control" disabled required>
+                                <input type="text" v-model="form.materia" class="form-control" disabled>
                             </div>
                             <div class="col-12 col-md-2">
                                 <label class="field-label">PRIMER CORTE</label>
@@ -129,7 +129,7 @@
                                 <td>{{ nota.corte1 ?? '-' }}</td>
                                 <td>{{ nota.corte2 ?? '-' }}</td>
                                 <td>{{ nota.corte3 ?? '-' }}</td>
-                                <td>{{ (nota.corte3 * .35 + nota.corte1 * .35 + nota.corte2 * .30) ?? '-' }}</td>
+                                <td>{{ calcularAcumulado(nota) }}</td>
                                 <td class="actions-cell">
                                     <button @click="editarNota(nota)" class="btn btn-warning btn-sm action-btn"
                                         title="Editar">
@@ -166,28 +166,29 @@ import axios from 'axios'
 import Loading from 'vue-loading-overlay';
 import 'vue-loading-overlay/dist/vue-loading.css';
 import LaravelVuePagination from '../../../../../node_modules/laravel-vue-pagination';
+
 export default {
     components: {
         Loading,
         'Pagination': LaravelVuePagination,
     },
     computed: {
-        isActived: function () {
+        isActived() {
             return this.pagination.current_page;
         },
-        pagesNumber: function () {
+        pagesNumber() {
             if (!this.pagination.to) {
                 return [];
             }
-            var from = this.pagination.current_page - this.offset;
+            let from = this.pagination.current_page - this.offset;
             if (from < 1) {
                 from = 1;
             }
-            var to = from + (this.offset * 2)
+            let to = from + (this.offset * 2);
             if (to >= this.pagination.last_page) {
                 to = this.pagination.last_page;
             }
-            var pagesArray = [];
+            const pagesArray = [];
             while (from <= to) {
                 pagesArray.push(from);
                 from++;
@@ -198,17 +199,20 @@ export default {
     data() {
         return {
             salir: false,
+            isLoading: false,
             activeClass: 'text-success',
             errorClass: 'text-danger',
             onCancel: this.onCancel,
             identidad: '',
+            vista: 'listado',
+            asignaturaActual: null,
             pagination: {
-                'total': 0,
-                'current_page': 0,
-                'per_page': 0,
-                'last_page': 0,
-                'from': 0,
-                'to': 0,
+                total: 0,
+                current_page: 0,
+                per_page: 0,
+                last_page: 0,
+                from: 0,
+                to: 0,
             },
             offset: 2,
             nota: [],
@@ -216,7 +220,8 @@ export default {
             form: {
                 semestre: '',
                 materia: '',
-                materias: '',
+                materia_id: null,
+                asignatura_id: null,
                 corte1: null,
                 corte2: null,
                 corte3: null,
@@ -228,115 +233,59 @@ export default {
         }
     },
     mounted() {
-        this.created()
+        this.created(1);
     },
     methods: {
-        changePage: function (page) {
+        changePage(page) {
+            if (page < 1 || page > this.pagination.last_page) return;
             this.pagination.current_page = page;
             this.created(page);
         },
         tieneMaterias(items) {
             return String(items?.mat_matr ?? '').trim().toLowerCase() === 'si';
         },
+        calcularAcumulado(nota) {
+            const c1 = Number(nota.corte1);
+            const c2 = Number(nota.corte2);
+            const c3 = Number(nota.corte3);
+            if ([nota.corte1, nota.corte2, nota.corte3].some(v => v === null || v === undefined || v === '')) {
+                return '-';
+            }
+            return (c1 * 0.35 + c2 * 0.30 + c3 * 0.35).toFixed(2);
+        },
         imprimirTabla() {
-            window.print(table);
+            window.print();
         },
         async consulta(items) {
-            const res = await axios.get(`/notas/${items.asignatura_id}`, this.form,)
-            this.notas = res.data
-            this.imprimir(this.notas)
+            try {
+                const res = await axios.get(`/notas/${items.asignatura_id}`);
+                this.notas = Array.isArray(res.data) ? res.data : [];
+                this.imprimir(this.notas);
+            } catch (error) {
+                console.error(error);
+                if (window.toastr) toastr.error('No fue posible consultar las notas.');
+            }
         },
         imprimir(notas) {
-            if (this.notas.length > 0) {
-                console.log(this.notas)
-                var sem = this.notas.semestre
-            }
-
             const logoUrl = `${window.location.origin}/images/aishap.png`;
-            if (notas.semestre == 1) {
-                var sem = "Primer";
-            } else if (notas.semestre == 2) {
-                var sem = "Segundo";
-            } else if (notas.semestre == 3) {
-                var sem = "Tercer";
-            } else if (notas.semestre == 4) {
-                var sem = "Cuarto";
-            } else {
-                var sem = "Quinto"
-            }
-
+            const primera = Array.isArray(notas) ? notas[0] : notas;
+            const semestres = { 1: 'Primer', 2: 'Segundo', 3: 'Tercer', 4: 'Cuarto', 5: 'Quinto' };
+            const sem = semestres[primera?.semestre] || 'Quinto';
             const contenido = `
-<html>
-<head>
-<title align="center">Factura de Pago</title>
-<style>
-body { font-family: Arial; padding: 20px; font-size: 8px;}
-h2 { margin-bottom: 0; }
-table { width: 100%; border-collapse: collapse; margin-top: 10px;font-size: 6px; }
-th { border-bottom: 1px solid black; }
-th { border-top: 1px solid black; }
-#ti { text-align: center; }
-#im { text-align: right; }
-.linea { margin: 10px 0; border: none; border-top: 1px solid #ccc; }
-.header { margin-bottom: 1px; }
-.item { margin-bottom: 1px; }
-</style>
-</head>
-<body>
-<div class="header">
-<img src="${logoUrl}" alt="Logo" style="max-height: 60px; margin-right:30px;">
-<p id="ti">Fundacion para el Desarrollo Educativo y Social de la Guajira </p>
-<p id="ti"><strong>NIT:</strong> 901691754-7</p>
-<h2>Factura de Pago</h2>
-<p id="im"><strong>Fecha de impresión:</strong> ${new Date().toLocaleDateString('es-CO')}</p>
-<div class="info-cliente">
-<p><strong>Estudiante:</strong> ${notas.name}</p>
-<p><strong>Documento:</strong> ${notas.documento}</p>
-</div>
-</div>
-<div class="factura-container">
-<table>
-<thead>
-<tr>
-<th>Semestre</th>
-<th>Materia</th>
-<th>Primer corte</th>
-<th>Segundo corte</th>
-<th>Tercer Corte</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<th>Pago de matricula perteneciente al ${sem} Semestre</th>
-<th>notas.materia</th>
-</tr>
-</tbody>
-<tfoot>
-<tr><td></td><th>Total:</th></tr>
-</tfoot>
-<tfoot>
-<tr><td></td><td>Sub Total:</td><td></td></tr>
-</tfoot>
-<tfoot>
-<tr><td></td><td>Impuestos(0%):</td><td>$ 0</td></tr>
-</tfoot>
-</table>
-</div>
-<br><br><br>
-<div style="text-align: left;">
-<img src="${window.location.origin}/images/firma.png" alt="Firma" style="width: 100px; height: auto;">
-<p style="font-size: 8px; margin: 0;"><strong>Anyelis Deluque Galván</strong></p>
-<p style="font-size: 8px; margin: 0;">Representante Legal</p>
-</div>
-<div style="text-align: center; margin-top:40px;">
-<p style="font-size: 8px; margin: 0;"><strong>RESOLUCIÓN 11287 DEL 26 DE AGOSTO DE 2013</strong></p>
-<p style="font-size: 8px; margin: 0;">Cra. 18 No. 21 - 76\tCel.: 302 752 1119\tfundescguajira@gmail.com</p>
-<p style="font-size: 8px; margin: 0;">Riohacha, La Guajira</p>
-</div>
-</body>
-</html>
-`;
+<html><head><title>Calificaciones</title><style>
+body { font-family: Arial; padding: 20px; font-size: 8px; }
+table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 8px; }
+th,td { border: 1px solid #999; padding: 5px; }
+#ti { text-align: center; } #im { text-align: right; }
+</style></head><body>
+<div><img src="${logoUrl}" alt="Logo" style="max-height:60px;"><p id="ti">Fundacion para el Desarrollo Educativo y Social de la Guajira</p><p id="ti"><strong>NIT:</strong> 901691754-7</p>
+<h2>Reporte de Calificaciones</h2><p id="im"><strong>Fecha:</strong> ${new Date().toLocaleDateString('es-CO')}</p>
+<p><strong>Estudiante:</strong> ${primera?.name || ''}</p><p><strong>Documento:</strong> ${primera?.documento || ''}</p><p><strong>Semestre:</strong> ${sem}</p></div>
+<table><thead><tr><th>Materia</th><th>Primer corte</th><th>Segundo corte</th><th>Tercer corte</th></tr></thead><tbody>
+${(Array.isArray(notas) ? notas : []).map(n => `<tr><td>${n.materia || ''}</td><td>${n.corte1 ?? '-'}</td><td>${n.corte2 ?? '-'}</td><td>${n.corte3 ?? '-'}</td></tr>`).join('')}
+</tbody></table></body></html>`;
             const ventana = window.open('', '_blank');
+            if (!ventana) return;
             ventana.document.write(contenido);
             ventana.document.close();
             ventana.onload = () => {
@@ -344,81 +293,79 @@ th { border-top: 1px solid black; }
                     ventana.focus();
                     ventana.print();
                     ventana.close();
-                }, 800);
+                }, 300);
             };
         },
         buscar() {
             this.isLoading = true;
-            axios.post('/notas/buscar', {
-                identidad: this.identidad,
-            })
+            axios.post('/notas/buscar', { identidad: this.identidad })
                 .then((res) => {
-                    this.nota = res.data.nota.data
-                    this.pagination = res.data.pagination
-                    this.isLoading = false
-                }).catch((error) => {
-                    this.nota = [];
-                    this.isLoading = false
+                    this.nota = res.data.nota.data;
+                    this.pagination = res.data.pagination;
                 })
+                .catch((error) => {
+                    console.error(error);
+                    this.nota = [];
+                })
+                .finally(() => {
+                    this.isLoading = false;
+                });
         },
-        async created(page) {
-            dos.hidden = true;
+        async created(page = 1) {
+            this.vista = 'listado';
             this.isLoading = true;
             try {
                 const res = await axios.get('/nota?page=' + page);
                 this.nota = res.data.nota.data;
                 this.pagination = res.data.pagination;
-                this.isLoading = false;
-                this.semestre = '';
-                this.id = '';
-                this.estado = '';
-                this.btncrear = true;
-                this.btnedit = false;
             } catch (error) {
+                console.error('No fue posible cargar los matriculados:', error);
+                this.nota = [];
+                if (window.toastr) toastr.error('No fue posible cargar los matriculados.');
+            } finally {
                 this.isLoading = false;
-                console.error(error);
             }
         },
         ocultar() {
-            dos.hidden = true
-            main.hidden = false
-            this.created()
+            this.vista = 'listado';
+            this.editando = false;
+            this.idEdit = null;
+            this.created(this.pagination.current_page || 1);
         },
         async materia(items) {
             this.isLoading = true;
             try {
-                await axios.post('/agregar/materia', {
+                const response = await axios.post('/agregar/materia', {
                     semestre: items.semestre,
                     matricula: items.asignatura_id,
                 });
-
-                // Actualiza el estado de la fila sin ocultar la pantalla de notas.
                 items.mat_matr = 'Si';
+                if (window.toastr) toastr.success(response.data?.message || 'Materias agregadas correctamente.');
                 await this.getNotas(items);
             } catch (error) {
                 console.error('No fue posible agregar las materias:', error);
-                if (window.toastr) {
-                    toastr.error(error.response?.data?.message || 'No fue posible agregar las materias del semestre.');
-                } else {
-                    window.alert(error.response?.data?.message || 'No fue posible agregar las materias del semestre.');
-                }
+                const mensaje = error.response?.data?.message || 'No fue posible agregar las materias del semestre.';
+                if (window.toastr) toastr.error(mensaje);
+                else window.alert(mensaje);
             } finally {
                 this.isLoading = false;
             }
         },
         async getNotas(items) {
+            if (!items?.asignatura_id) return;
             this.salir = false;
             this.idEdit = null;
             this.editando = false;
-            document.getElementById('dos').hidden = false;
-            document.getElementById('main').hidden = true;
+            this.asignaturaActual = items.asignatura_id;
+            this.vista = 'gestion';
             try {
                 const res = await axios.get(`/notas/${items.asignatura_id}`);
                 this.notas = Array.isArray(res.data) ? res.data : [];
                 this.form = {
                     semestre: items.semestre,
                     materia: '',
-                    materias: '',
+                    materia_id: null,
+                    asignatura_id: items.asignatura_id,
                     corte1: null,
                     corte2: null,
                     corte3: null,
@@ -426,54 +373,54 @@ th { border-top: 1px solid black; }
                 };
             } catch (error) {
                 console.error('No fue posible consultar las notas:', error);
-                if (window.toastr) toastr.error('No fue posible cargar las notas del estudiante.');
+                this.notas = [];
+                if (window.toastr) toastr.error(error.response?.data?.message || 'No fue posible cargar las notas del estudiante.');
             }
         },
-        guardarNota() {
+        async guardarNota() {
+            if (!this.idEdit) return;
             this.isLoading = true;
-            axios.put(`/nota/${this.idEdit}`, this.form)
-                .then((res) => {
-                    this.notas = res.data
-                    this.getNotas(this.notas)
-                    console.log(this.notas)
-                    this.isLoading = false
-                }).catch((error) => {
-                    this.nota = [];
-                    this.isLoading = false
-                })
-        },
-        async guardarNotai() {
-            await axios.put(`/nota/${this.idEdit}`, this.form)
-            this.getNotas()
-            this.resetForm()
+            try {
+                const res = await axios.put(`/nota/${this.idEdit}`, this.form);
+                const asignaturaId = res.data?.asignatura_id || this.asignaturaActual;
+                if (window.toastr) toastr.success('Nota actualizada correctamente.');
+                await this.getNotas({ asignatura_id: asignaturaId, semestre: this.form.semestre });
+            } catch (error) {
+                console.error(error);
+                if (window.toastr) toastr.error(error.response?.data?.message || 'No fue posible actualizar la nota.');
+            } finally {
+                this.isLoading = false;
+            }
         },
         editarNota(nota) {
-            this.form = { ...nota }
-            this.idEdit = nota.id
-            console.log(this.form)
-            this.editando = true
-            this.salir = false
+            this.form = { ...nota };
+            this.idEdit = nota.id;
+            this.editando = true;
+            this.salir = false;
         },
         cancelarEdicion() {
-            this.resetForm()
+            this.resetForm();
         },
         resetForm() {
             this.form = {
                 semestre: '',
                 materia: '',
+                materia_id: null,
+                asignatura_id: this.asignaturaActual,
                 corte1: null,
                 corte2: null,
                 corte3: null,
                 habilitada_recuperacion: false
-            }
-            this.editando = false
-            this.salir = true
-            this.idEdit = null
+            };
+            this.editando = false;
+            this.idEdit = null;
         },
         async eliminarNota(id) {
             if (confirm('¿Eliminar esta nota?')) {
-                await axios.delete(`/notas/${id}`)
-                this.getNotas()
+                await axios.delete(`/notas/${id}`);
+                if (this.asignaturaActual) {
+                    await this.getNotas({ asignatura_id: this.asignaturaActual, semestre: this.form.semestre });
+                }
             }
         }
     },
@@ -485,7 +432,6 @@ th { border-top: 1px solid black; }
     background: #f4f6f8;
     min-height: 100%;
 }
-
 .notas-card {
     background: #fff;
     border-radius: 10px;
@@ -494,7 +440,6 @@ th { border-top: 1px solid black; }
     margin-bottom: 20px;
     border: 1px solid #edf0f3;
 }
-
 .section-title {
     border: 1px solid #d7dde5;
     background: #fff;
@@ -506,13 +451,11 @@ th { border-top: 1px solid black; }
     margin-bottom: 16px;
     text-transform: uppercase;
 }
-
 .notas-table {
     width: 100%;
     border-collapse: collapse;
     color: #536b86;
 }
-
 .notas-table th {
     background: #fff;
     color: #536b86;
@@ -525,7 +468,6 @@ th { border-top: 1px solid black; }
     border: 1px solid #d7dde5;
     white-space: nowrap;
 }
-
 .notas-table td {
     color: #536b86;
     font-size: 13px;
@@ -534,110 +476,26 @@ th { border-top: 1px solid black; }
     padding: 10px 8px;
     border: 1px solid #d7dde5;
 }
-
-.notas-table tbody tr:hover {
-    background: #fafbfc;
-}
-
-.filter-row th {
-    padding: 8px 20px;
-}
-
-.filter-row input {
-    min-height: 28px;
-    border: 1px solid #d7dde5;
-    box-shadow: none;
-}
-
-.actions-cell {
-    white-space: nowrap;
-}
-
+.notas-table tbody tr:hover { background: #fafbfc; }
+.filter-row th { padding: 8px 20px; }
+.filter-row input { min-height: 28px; border: 1px solid #d7dde5; box-shadow: none; }
+.actions-cell { white-space: nowrap; }
 .action-btn {
-    width: 36px;
-    height: 30px;
-    padding: 0;
-    margin: 0 2px;
-    border-radius: 5px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
+    width: 36px; height: 30px; padding: 0; margin: 0 2px; border-radius: 5px;
+    display: inline-flex; align-items: center; justify-content: center;
 }
-
-.table-footer {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding-top: 14px;
-}
-
-.total-label {
-    color: #65758b;
-    font-size: 13px;
-}
-
-.pagination .page-link {
-    color: #65758b;
-    border-color: #e1e6eb;
-    min-width: 30px;
-    text-align: center;
-}
-
-.pagination .page-item.active .page-link {
-    background: #686cff;
-    border-color: #686cff;
-    color: #fff;
-}
-
-.form-panel {
-    border: 1px solid #d7dde5;
-    padding: 16px 10px;
-}
-
-.field-label {
-    display: block;
-    color: #536b86;
-    font-size: 12px;
-    font-weight: 500;
-    margin-bottom: 6px;
-    text-transform: uppercase;
-}
-
-.form-panel .form-control {
-    border-color: #d7dde5;
-    min-height: 38px;
-    color: #536b86;
-    box-shadow: none;
-}
-
-.form-actions {
-    display: flex;
-    justify-content: flex-end;
-    gap: 8px;
-    margin-top: 16px;
-    padding-top: 14px;
-    border-top: 1px solid #d7dde5;
-}
-
-.empty-row {
-    color: #8a98a9 !important;
-    padding: 18px !important;
-}
-
+.table-footer { display: flex; justify-content: space-between; align-items: center; padding-top: 14px; }
+.total-label { color: #65758b; font-size: 13px; }
+.pagination .page-link { color: #65758b; border-color: #e1e6eb; min-width: 30px; text-align: center; }
+.pagination .page-item.active .page-link { background: #686cff; border-color: #686cff; color: #fff; }
+.form-panel { border: 1px solid #d7dde5; padding: 16px 10px; }
+.field-label { display: block; color: #536b86; font-size: 12px; font-weight: 500; margin-bottom: 6px; text-transform: uppercase; }
+.form-panel .form-control { border-color: #d7dde5; min-height: 38px; color: #536b86; box-shadow: none; }
+.form-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 16px; padding-top: 14px; border-top: 1px solid #d7dde5; }
+.empty-row { color: #8a98a9 !important; padding: 18px !important; }
 @media (max-width: 768px) {
-    .notas-card {
-        padding: 12px;
-    }
-
-    .table-footer {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 10px;
-    }
-
-    .notas-table th,
-    .notas-table td {
-        font-size: 11px;
-    }
+    .notas-card { padding: 12px; }
+    .table-footer { flex-direction: column; align-items: flex-start; gap: 10px; }
+    .notas-table th, .notas-table td { font-size: 11px; }
 }
 </style>
