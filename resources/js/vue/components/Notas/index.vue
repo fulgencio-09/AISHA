@@ -32,7 +32,7 @@
                                 <td>{{ items.semestre }}</td>
                                 <td class="actions-cell">
                                     <button @click="consulta(items)" class="btn btn-secondary btn-sm action-btn"
-                                        title="Imprimir">
+                                        title="Certificado de notas">
                                         <i class="fa fa-print"></i>
                                     </button>
                                     <button v-if="!tieneMaterias(items)" @click="materia(items)"
@@ -206,6 +206,7 @@ export default {
             identidad: '',
             vista: 'listado',
             asignaturaActual: null,
+            estudianteActual: null,
             pagination: {
                 total: 0,
                 current_page: 0,
@@ -257,44 +258,168 @@ export default {
             window.print();
         },
         async consulta(items) {
+            this.isLoading = true;
             try {
                 const res = await axios.get(`/notas/${items.asignatura_id}`);
                 this.notas = Array.isArray(res.data) ? res.data : [];
-                this.imprimir(this.notas);
+                this.imprimirCertificado(items, this.notas);
             } catch (error) {
                 console.error(error);
-                if (window.toastr) toastr.error('No fue posible consultar las notas.');
+                if (window.toastr) toastr.error(error.response?.data?.message || 'No fue posible consultar las notas.');
+            } finally {
+                this.isLoading = false;
             }
         },
-        imprimir(notas) {
+        escaparHtml(valor) {
+            return String(valor ?? '')
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        },
+        nombreSemestre(semestre) {
+            const nombres = {
+                1: 'Primer',
+                2: 'Segundo',
+                3: 'Tercer',
+                4: 'Cuarto',
+                5: 'Quinto'
+            };
+            return nombres[Number(semestre)] || `${semestre}°`;
+        },
+        imprimirCertificado(items, notas) {
             const logoUrl = `${window.location.origin}/images/aishap.png`;
-            const primera = Array.isArray(notas) ? notas[0] : notas;
-            const semestres = { 1: 'Primer', 2: 'Segundo', 3: 'Tercer', 4: 'Cuarto', 5: 'Quinto' };
-            const sem = semestres[primera?.semestre] || 'Quinto';
+            const semestre = this.nombreSemestre(items?.semestre);
+            const estudiante = this.escaparHtml(items?.name || '');
+            const documento = this.escaparHtml(items?.documento || '');
+            const anio = this.escaparHtml(items?.año || '');
+            const fecha = new Date().toLocaleDateString('es-CO', {
+                day: '2-digit',
+                month: 'long',
+                year: 'numeric'
+            });
+            const filas = (Array.isArray(notas) ? notas : []).map(nota => `
+                <tr>
+                    <td>${this.escaparHtml(nota.materia)}</td>
+                    <td>${nota.corte1 ?? '-'}</td>
+                    <td>${nota.corte2 ?? '-'}</td>
+                    <td>${nota.corte3 ?? '-'}</td>
+                    <td>${this.calcularAcumulado(nota)}</td>
+                </tr>
+            `).join('');
+
+            const acumulados = (Array.isArray(notas) ? notas : [])
+                .map(n => this.calcularAcumulado(n))
+                .filter(v => v !== '-');
+            const promedio = acumulados.length
+                ? (acumulados.reduce((sum, valor) => sum + Number(valor), 0) / acumulados.length).toFixed(2)
+                : '-';
+
             const contenido = `
-<html><head><title>Calificaciones</title><style>
-body { font-family: Arial; padding: 20px; font-size: 8px; }
-table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 8px; }
-th,td { border: 1px solid #999; padding: 5px; }
-#ti { text-align: center; } #im { text-align: right; }
-</style></head><body>
-<div><img src="${logoUrl}" alt="Logo" style="max-height:60px;"><p id="ti">Fundacion para el Desarrollo Educativo y Social de la Guajira</p><p id="ti"><strong>NIT:</strong> 901691754-7</p>
-<h2>Reporte de Calificaciones</h2><p id="im"><strong>Fecha:</strong> ${new Date().toLocaleDateString('es-CO')}</p>
-<p><strong>Estudiante:</strong> ${primera?.name || ''}</p><p><strong>Documento:</strong> ${primera?.documento || ''}</p><p><strong>Semestre:</strong> ${sem}</p></div>
-<table><thead><tr><th>Materia</th><th>Primer corte</th><th>Segundo corte</th><th>Tercer corte</th></tr></thead><tbody>
-${(Array.isArray(notas) ? notas : []).map(n => `<tr><td>${n.materia || ''}</td><td>${n.corte1 ?? '-'}</td><td>${n.corte2 ?? '-'}</td><td>${n.corte3 ?? '-'}</td></tr>`).join('')}
-</tbody></table></body></html>`;
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Certificación de Notas - ${estudiante}</title>
+<style>
+    @page { size: A4; margin: 20mm 18mm; }
+    * { box-sizing: border-box; }
+    body { font-family: Arial, Helvetica, sans-serif; color: #222; margin: 0; font-size: 11px; }
+    .certificado { max-width: 780px; margin: 0 auto; }
+    .encabezado { text-align: center; border-bottom: 2px solid #4b6b8a; padding-bottom: 12px; }
+    .logo { max-height: 75px; max-width: 150px; margin-bottom: 5px; }
+    .institucion { color: #4b6b8a; font-size: 14px; font-weight: bold; text-transform: uppercase; }
+    .nit { margin-top: 4px; font-size: 10px; }
+    .titulo { text-align: center; margin: 24px 0 18px; font-size: 18px; font-weight: bold; text-transform: uppercase; }
+    .texto { line-height: 1.7; text-align: justify; margin-bottom: 15px; }
+    .datos { width: 100%; border-collapse: collapse; margin: 12px 0 18px; }
+    .datos td { padding: 6px 8px; border: 1px solid #d6dde5; }
+    .datos .label { width: 18%; background: #f2f5f8; font-weight: bold; }
+    .notas { width: 100%; border-collapse: collapse; margin-top: 12px; }
+    .notas th { background: #eef2f6; font-weight: bold; text-transform: uppercase; }
+    .notas th, .notas td { border: 1px solid #aeb8c2; padding: 7px; text-align: center; }
+    .notas th:first-child, .notas td:first-child { text-align: left; }
+    .promedio { text-align: right; margin-top: 12px; font-weight: bold; }
+    .firma { margin-top: 65px; width: 260px; text-align: center; }
+    .linea { border-top: 1px solid #222; margin-bottom: 7px; }
+    .pie { margin-top: 35px; text-align: center; color: #666; font-size: 9px; }
+</style>
+</head>
+<body>
+<div class="certificado">
+    <div class="encabezado">
+        <img src="${logoUrl}" class="logo" alt="AISHA">
+        <div class="institucion">Fundación para el Desarrollo Educativo y Social de La Guajira</div>
+        <div class="nit"><strong>NIT:</strong> 901691754-7</div>
+    </div>
+
+    <div class="titulo">Certificación de Notas</div>
+
+    <div class="texto">
+        La Fundación para el Desarrollo Educativo y Social de La Guajira certifica que el(la) estudiante
+        <strong>${estudiante}</strong>, identificado(a) con documento No. <strong>${documento}</strong>,
+        cursó las asignaturas correspondientes al <strong>${semestre} semestre</strong>${anio ? ` del año <strong>${anio}</strong>` : ''},
+        de acuerdo con los registros académicos disponibles en el sistema institucional.
+    </div>
+
+    <table class="datos">
+        <tr><td class="label">Estudiante</td><td>${estudiante}</td></tr>
+        <tr><td class="label">Documento</td><td>${documento}</td></tr>
+        <tr><td class="label">Semestre</td><td>${semestre}</td></tr>
+        ${anio ? `<tr><td class="label">Año</td><td>${anio}</td></tr>` : ''}
+        <tr><td class="label">Fecha de expedición</td><td>${fecha}</td></tr>
+    </table>
+
+    <table class="notas">
+        <thead>
+            <tr>
+                <th>Materia</th>
+                <th>Corte 1</th>
+                <th>Corte 2</th>
+                <th>Corte 3</th>
+                <th>Nota final</th>
+            </tr>
+        </thead>
+        <tbody>
+            ${filas || '<tr><td colspan="5">No hay calificaciones registradas para este semestre.</td></tr>'}
+        </tbody>
+    </table>
+
+    <div class="promedio">Promedio del semestre: ${promedio}</div>
+
+    <div class="texto" style="margin-top: 22px;">
+        La presente certificación se expide a solicitud del interesado para los fines que estime convenientes.
+    </div>
+
+    <div class="firma">
+        <div class="linea"></div>
+        <strong>Área Académica</strong><br>
+        Fundación para el Desarrollo Educativo y Social de La Guajira
+    </div>
+
+    <div class="pie">Documento generado por el sistema académico AISHA.</div>
+</div>
+<script>
+    window.onload = function () {
+        setTimeout(function () {
+            window.focus();
+            window.print();
+            window.close();
+        }, 500);
+    };
+</script>
+</body>
+</html>`;
+
             const ventana = window.open('', '_blank');
-            if (!ventana) return;
+            if (!ventana) {
+                if (window.toastr) toastr.warning('El navegador bloqueó la ventana de impresión. Permita las ventanas emergentes para este sitio.');
+                return;
+            }
+            ventana.document.open();
             ventana.document.write(contenido);
             ventana.document.close();
-            ventana.onload = () => {
-                setTimeout(() => {
-                    ventana.focus();
-                    ventana.print();
-                    ventana.close();
-                }, 300);
-            };
         },
         buscar() {
             this.isLoading = true;
@@ -357,6 +482,7 @@ ${(Array.isArray(notas) ? notas : []).map(n => `<tr><td>${n.materia || ''}</td><
             this.idEdit = null;
             this.editando = false;
             this.asignaturaActual = items.asignatura_id;
+            this.estudianteActual = items;
             this.vista = 'gestion';
             try {
                 const res = await axios.get(`/notas/${items.asignatura_id}`);
@@ -381,121 +507,75 @@ ${(Array.isArray(notas) ? notas : []).map(n => `<tr><td>${n.materia || ''}</td><
             if (!this.idEdit) return;
             this.isLoading = true;
             try {
-                const res = await axios.put(`/nota/${this.idEdit}`, this.form);
-                const asignaturaId = res.data?.asignatura_id || this.asignaturaActual;
-                if (window.toastr) toastr.success('Nota actualizada correctamente.');
-                await this.getNotas({ asignatura_id: asignaturaId, semestre: this.form.semestre });
+                await axios.put(`/nota/${this.idEdit}`, {
+                    corte1: this.form.corte1,
+                    corte2: this.form.corte2,
+                    corte3: this.form.corte3,
+                    asignatura_id: this.asignaturaActual,
+                });
+                if (window.toastr) toastr.success('Calificación actualizada correctamente.');
+                this.editando = false;
+                this.idEdit = null;
+                await this.getNotas(this.estudianteActual);
             } catch (error) {
                 console.error(error);
-                if (window.toastr) toastr.error(error.response?.data?.message || 'No fue posible actualizar la nota.');
+                if (window.toastr) toastr.error(error.response?.data?.message || 'No fue posible actualizar la calificación.');
             } finally {
                 this.isLoading = false;
             }
         },
         editarNota(nota) {
-            this.form = { ...nota };
             this.idEdit = nota.id;
             this.editando = true;
-            this.salir = false;
+            this.form = {
+                ...this.form,
+                semestre: nota.semestre,
+                materia: nota.materia,
+                materia_id: nota.materia_id,
+                asignatura_id: nota.asignatura_id,
+                corte1: nota.corte1,
+                corte2: nota.corte2,
+                corte3: nota.corte3,
+                habilitada_recuperacion: nota.habilitada_recuperacion
+            };
         },
         cancelarEdicion() {
-            this.resetForm();
-        },
-        resetForm() {
+            this.idEdit = null;
+            this.editando = false;
             this.form = {
-                semestre: '',
+                ...this.form,
                 materia: '',
                 materia_id: null,
-                asignatura_id: this.asignaturaActual,
                 corte1: null,
                 corte2: null,
                 corte3: null,
-                habilitada_recuperacion: false
             };
-            this.editando = false;
-            this.idEdit = null;
         },
-        async eliminarNota(id) {
-            if (confirm('¿Eliminar esta nota?')) {
-                await axios.delete(`/notas/${id}`);
-                if (this.asignaturaActual) {
-                    await this.getNotas({ asignatura_id: this.asignaturaActual, semestre: this.form.semestre });
-                }
-            }
-        }
-    },
+    }
 }
 </script>
 
 <style scoped>
-.notas-page {
-    background: #f4f6f8;
-    min-height: 100%;
-}
-.notas-card {
-    background: #fff;
-    border-radius: 10px;
-    box-shadow: 0 3px 12px rgba(40, 50, 60, 0.10);
-    padding: 18px 20px;
-    margin-bottom: 20px;
-    border: 1px solid #edf0f3;
-}
-.section-title {
-    border: 1px solid #d7dde5;
-    background: #fff;
-    color: #536b86;
-    text-align: center;
-    font-size: 14px;
-    font-weight: 500;
-    padding: 6px 10px;
-    margin-bottom: 16px;
-    text-transform: uppercase;
-}
-.notas-table {
-    width: 100%;
-    border-collapse: collapse;
-    color: #536b86;
-}
-.notas-table th {
-    background: #fff;
-    color: #536b86;
-    font-size: 12px;
-    font-weight: 600;
-    letter-spacing: .5px;
-    text-align: center;
-    vertical-align: middle;
-    padding: 11px 8px;
-    border: 1px solid #d7dde5;
-    white-space: nowrap;
-}
-.notas-table td {
-    color: #536b86;
-    font-size: 13px;
-    text-align: center;
-    vertical-align: middle;
-    padding: 10px 8px;
-    border: 1px solid #d7dde5;
-}
-.notas-table tbody tr:hover { background: #fafbfc; }
-.filter-row th { padding: 8px 20px; }
-.filter-row input { min-height: 28px; border: 1px solid #d7dde5; box-shadow: none; }
+.notas-page { min-height: 100vh; }
+.notas-card { background: #fff; border: 1px solid #e4e9ef; border-radius: 10px; box-shadow: 0 4px 14px rgba(31, 45, 61, .08); padding: 16px; margin-bottom: 18px; }
+.section-title { border: 1px solid #d5dce4; color: #536b84; text-align: center; text-transform: none; font-size: 15px; padding: 5px 10px; margin-bottom: 16px; background: #fff; }
+.notas-table { border: 1px solid #d5dce4; font-size: 13px; }
+.notas-table th { color: #536b84; font-size: 12px; letter-spacing: .7px; text-align: center; vertical-align: middle; border-color: #d5dce4; padding: 10px 8px; }
+.notas-table td { text-align: center; vertical-align: middle; border-color: #d5dce4; padding: 9px 8px; }
+.filter-row th { padding: 8px; }
+.filter-row input { max-width: 180px; }
 .actions-cell { white-space: nowrap; }
-.action-btn {
-    width: 36px; height: 30px; padding: 0; margin: 0 2px; border-radius: 5px;
-    display: inline-flex; align-items: center; justify-content: center;
-}
-.table-footer { display: flex; justify-content: space-between; align-items: center; padding-top: 14px; }
-.total-label { color: #65758b; font-size: 13px; }
-.pagination .page-link { color: #65758b; border-color: #e1e6eb; min-width: 30px; text-align: center; }
-.pagination .page-item.active .page-link { background: #686cff; border-color: #686cff; color: #fff; }
-.form-panel { border: 1px solid #d7dde5; padding: 16px 10px; }
-.field-label { display: block; color: #536b86; font-size: 12px; font-weight: 500; margin-bottom: 6px; text-transform: uppercase; }
-.form-panel .form-control { border-color: #d7dde5; min-height: 38px; color: #536b86; box-shadow: none; }
-.form-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 16px; padding-top: 14px; border-top: 1px solid #d7dde5; }
-.empty-row { color: #8a98a9 !important; padding: 18px !important; }
+.action-btn { min-width: 36px; height: 32px; margin: 0 2px; border-radius: 6px; box-shadow: 0 3px 7px rgba(31,45,61,.16); }
+.table-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 14px; gap: 12px; }
+.total-label { color: #62758a; font-size: 13px; }
+.pagination .page-link { color: #61758c; border-color: #e2e7ec; }
+.pagination .page-item.active .page-link { color: #fff; background: #6c63ff; border-color: #6c63ff; }
+.form-panel { border: 1px solid #d5dce4; padding: 14px; background: #fff; }
+.field-label { display: block; color: #536b84; font-size: 12px; margin-bottom: 6px; }
+.form-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 16px; }
+.empty-row { color: #7d8b99; padding: 25px !important; }
 @media (max-width: 768px) {
-    .notas-card { padding: 12px; }
-    .table-footer { flex-direction: column; align-items: flex-start; gap: 10px; }
-    .notas-table th, .notas-table td { font-size: 11px; }
+    .table-footer { flex-direction: column; align-items: flex-start; }
+    .notas-table { min-width: 760px; }
 }
 </style>
