@@ -14,13 +14,11 @@ class Nota extends Model
         'semestre',
         'materia',
         'materia_id',
-        'materias_id',
         'asignatura_id',
         'corte1',
         'corte2',
         'corte3',
         'habilitada_recuperacion',
-        'matriculado_en',
     ];
 
     protected $casts = [
