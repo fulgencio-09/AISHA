@@ -134,9 +134,6 @@
     value="{{ csrf_token() }}"
 >
 
-<script src="{{ asset('js/app.js') }}"></script>
-<script src="{{asset('js/main.js')}}"></script>
-<script src="../assets/vendor/js/menu.js"></script>
 <!-- =====================================================
      JAVASCRIPT
 ===================================================== -->
@@ -202,13 +199,14 @@
      SNEAT MENU
 ===================================================== -->
 
-<script src="{{ asset('assets/vendor/js/menu.js') }}"></script>
+
 
 
 <!-- =====================================================
      SNEAT MAIN
 ===================================================== -->
 
+<script src="{{ asset('assets/vendor/js/menu.js') }}"></script>
 <script src="{{ asset('assets/js/main.js') }}"></script>
 
 
