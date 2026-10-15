@@ -9,6 +9,7 @@ use App\Models\SeguroMatricula;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
 
 class Asignatura extends Controller
@@ -184,8 +185,6 @@ class Asignatura extends Controller
         $periodo = $validated['periodo'];
         $semestre = $validated['semestre'];
 
-        // Una matrícula se considera repetida solamente cuando coincide
-        // estudiante + año + periodo + semestre.
         $verificador = ModelsAsignatura::where('estudiante_id', $inputs)
             ->where('año', $ano)
             ->where('periodo', $periodo)
@@ -198,7 +197,6 @@ class Asignatura extends Controller
             ], 422);
         }
 
-        // Conserva la validación histórica de deuda para la misma combinación académica.
         $verificador = ModelsAsignatura::where('estudiante_id', $inputs)
             ->where('año', $ano)
             ->where('periodo', $periodo)
@@ -215,6 +213,10 @@ class Asignatura extends Controller
         $asignatura = DB::transaction(function () use ($validated) {
             $seguroValor = $validated['seguro_valor'];
             unset($validated['seguro_valor']);
+
+            // La tabla asignaturas exige user_id. Se registra el usuario autenticado
+            // que realiza la matrícula para conservar la trazabilidad existente.
+            $validated['user_id'] = Auth::id();
 
             $asignatura = ModelsAsignatura::create($validated);
 
