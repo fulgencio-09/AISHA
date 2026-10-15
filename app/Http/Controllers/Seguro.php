@@ -25,6 +25,33 @@ class Seguro extends Controller
             $query->where('estado', $request->input('estado'));
         }
 
+        $query->when($request->filled('ano'), function ($q) use ($request) {
+            $q->whereHas('asignatura', function ($asignatura) use ($request) {
+                $asignatura->where('año', $request->input('ano'));
+            });
+        });
+
+        $query->when($request->filled('periodo'), function ($q) use ($request) {
+            $q->whereHas('asignatura', function ($asignatura) use ($request) {
+                $asignatura->where('periodo', $request->input('periodo'));
+            });
+        });
+
+        $query->when($request->filled('semestre'), function ($q) use ($request) {
+            $q->whereHas('asignatura', function ($asignatura) use ($request) {
+                $asignatura->where('semestre', $request->input('semestre'));
+            });
+        });
+
+        $query->when($request->filled('buscar'), function ($q) use ($request) {
+            $buscar = trim($request->input('buscar'));
+
+            $q->whereHas('asignatura.estudiante', function ($estudiante) use ($buscar) {
+                $estudiante->where('documento', 'like', "%{$buscar}%")
+                    ->orWhere('name', 'like', "%{$buscar}%");
+            });
+        });
+
         return $query->orderByDesc('id')->paginate(20);
     }
 
