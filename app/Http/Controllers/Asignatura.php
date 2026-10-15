@@ -5,8 +5,11 @@ namespace App\Http\Controllers;
 use Illuminate\Support\Arr;
 use App\Models\Asignatura as ModelsAsignatura;
 use App\Models\Estudiante;
+use App\Models\SeguroMatricula;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\Rule;
 
 class Asignatura extends Controller
 {
@@ -152,22 +155,34 @@ class Asignatura extends Controller
 
     public function update(Request $request, $id)
     {
-        $asignatura = ModelsAsignatura::find($id);
+        $asignatura = ModelsAsignatura::findOrFail($id);
         $asignatura->valor = $request->valor;
         $asignatura->total = $request->total;
         $asignatura->semestre = $request->semestre;
         $asignatura->sede = $request->sede;
         $asignatura->periodo = $request->periodo;
         $asignatura->save();
+
+        return response()->json($asignatura);
     }
 
     public function store(Request $request)
     {
-        $input = $request->all();
-        $inputs = $input['estudiante_id'];
-        $ano = $input['año'] ?? null;
-        $periodo = $input['periodo'] ?? null;
-        $semestre = $input['semestre'] ?? null;
+        $validated = $request->validate([
+            'estudiante_id' => ['required', 'integer', 'exists:estudiantes,id'],
+            'año' => ['required', 'integer', 'min:2021'],
+            'periodo' => ['required', Rule::in([1, 2, '1', '2'])],
+            'semestre' => ['required', 'integer', 'between:1,5'],
+            'sede' => ['required', 'string', 'max:100'],
+            'total' => ['required', 'numeric', 'min:0'],
+            'valor' => ['required', 'numeric', 'min:0'],
+            'seguro_valor' => ['required', 'numeric', 'gt:0'],
+        ]);
+
+        $inputs = $validated['estudiante_id'];
+        $ano = $validated['año'];
+        $periodo = $validated['periodo'];
+        $semestre = $validated['semestre'];
 
         // Una matrícula se considera repetida solamente cuando coincide
         // estudiante + año + periodo + semestre.
@@ -175,28 +190,48 @@ class Asignatura extends Controller
             ->where('año', $ano)
             ->where('periodo', $periodo)
             ->where('semestre', $semestre)
-            ->get();
+            ->exists();
 
-        if (isset($verificador[0])) {
-            return response()->json('no');
+        if ($verificador) {
+            return response()->json([
+                'message' => 'El estudiante ya tiene una matrícula registrada para el año, período y semestre seleccionados.'
+            ], 422);
         }
 
-        // Si ya existe la misma matrícula académica con saldo pendiente,
-        // se mantiene la validación de deuda para ese mismo año/período.
+        // Conserva la validación histórica de deuda para la misma combinación académica.
         $verificador = ModelsAsignatura::where('estudiante_id', $inputs)
             ->where('año', $ano)
             ->where('periodo', $periodo)
             ->where('semestre', $semestre)
             ->where('valor', '>', 0)
-            ->get();
+            ->exists();
 
-        if (isset($verificador[0])) {
-            return response()->json('debe');
+        if ($verificador) {
+            return response()->json([
+                'message' => 'La matrícula seleccionada tiene saldo pendiente y no puede registrarse nuevamente.'
+            ], 422);
         }
 
-        $asignatura = ModelsAsignatura::create($input);
+        $asignatura = DB::transaction(function () use ($validated) {
+            $seguroValor = $validated['seguro_valor'];
+            unset($validated['seguro_valor']);
 
-        return response()->json($asignatura);
+            $asignatura = ModelsAsignatura::create($validated);
+
+            // El seguro nace automáticamente con la matrícula y queda pendiente.
+            SeguroMatricula::create([
+                'asignatura_id' => $asignatura->id,
+                'valor' => $seguroValor,
+                'estado' => 0,
+            ]);
+
+            return $asignatura->load('seguroMatricula');
+        });
+
+        return response()->json([
+            'message' => 'Matrícula y seguro estudiantil registrados correctamente.',
+            'data' => $asignatura,
+        ], 201);
     }
 
     public function show(Request $request)
