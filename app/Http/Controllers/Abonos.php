@@ -122,9 +122,11 @@ class Abonos extends Controller
 
     public function credito(Request $request, $id)
     {
+        // Este endpoint solamente carga los datos de la matrícula seleccionada.
+        // La validación definitiva para permitir el abono (matrícula activa + seguro pagado)
+        // se mantiene en store().
         $cred = Asignatura::join('estudiantes', 'estudiantes.id', '=', 'asignaturas.estudiante_id')
             ->where('asignaturas.id', '=', $id)
-            ->where('asignaturas.estado', '=', 1)
             ->where('asignaturas.valor', '>', 0)
             ->select(
                 'asignaturas.valor',
@@ -132,6 +134,7 @@ class Abonos extends Controller
                 'asignaturas.año',
                 'asignaturas.periodo',
                 'asignaturas.semestre',
+                'asignaturas.estado',
                 'estudiantes.name',
                 'estudiantes.documento'
             )
@@ -199,6 +202,7 @@ class Abonos extends Controller
                 'abonos.cantidad',
                 'abonos.deuda',
                 'abonos.fechas',
+                'abonos.deuda',
                 'asignaturas.valor',
                 'asignaturas.año',
                 'asignaturas.periodo',
