@@ -9,6 +9,7 @@ import Edit from './components/User/Edit.vue';
 import Alumno from './components/Alumnos/index.vue';
 import Matricula from './components/Asignaturas/index.vue';
 import Abonos from './components/Abonos/index.vue';
+import Seguro from './components/Seguro/index.vue';
 import Notas from './components/Notas/index.vue';
 import Reporte from './components/Reporte/index.vue';
 import Informe from './components/Reporte/relacion.vue';
@@ -60,6 +61,10 @@ const routes = [
       {
         path: '/abono/index',
         component: Abonos,      
+      },
+      {
+        path: '/seguro/index',
+        component: Seguro,
       },
       {
         path: '/nota/index',
