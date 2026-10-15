@@ -122,9 +122,8 @@ class Abonos extends Controller
 
     public function credito(Request $request, $id)
     {
-        // Este endpoint solamente carga los datos de la matrícula seleccionada.
-        // La validación definitiva para permitir el abono (matrícula activa + seguro pagado)
-        // se mantiene en store().
+        // Este endpoint solo carga la matrícula seleccionada.
+        // La regla de negocio para permitir el abono se valida en store().
         $cred = Asignatura::join('estudiantes', 'estudiantes.id', '=', 'asignaturas.estudiante_id')
             ->where('asignaturas.id', '=', $id)
             ->where('asignaturas.valor', '>', 0)
@@ -202,7 +201,6 @@ class Abonos extends Controller
                 'abonos.cantidad',
                 'abonos.deuda',
                 'abonos.fechas',
-                'abonos.deuda',
                 'asignaturas.valor',
                 'asignaturas.año',
                 'asignaturas.periodo',
@@ -246,13 +244,15 @@ class Abonos extends Controller
             ], 422);
         }
 
+        // La matrícula seleccionada es la fuente de verdad. No se exige estado aquí;
+        // la regla obligatoria para permitir el abono es que el seguro esté pagado.
         $asignatura = Asignatura::where('id', $asignatura_id)
-            ->where('estado', 1)
+            ->where('valor', '>', 0)
             ->first();
 
         if (!$asignatura) {
             return response()->json([
-                'message' => 'La matrícula seleccionada no está disponible para realizar el abono.'
+                'message' => 'La matrícula seleccionada no tiene saldo pendiente para realizar el abono.'
             ], 404);
         }
 
