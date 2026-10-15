@@ -59,7 +59,6 @@ class Seguro extends Controller
             }
         }
 
-        // Paginación del módulo. Por defecto 10 registros por página.
         $porPagina = min(max((int) $request->input('per_page', 10), 1), 50);
         $matriculas = $query->orderByDesc('id')->paginate($porPagina)->withQueryString();
 
@@ -121,12 +120,31 @@ class Seguro extends Controller
             'forma_pago' => ['required', 'string', 'max:100'],
             'referencia' => ['nullable', 'string', 'max:255'],
             'observacion' => ['nullable', 'string'],
+            // Si se envía desde el frontend, el valor debe coincidir exactamente
+            // con el valor parametrizado en la matrícula.
+            'valor_pago' => ['nullable', 'numeric', 'min:0'],
         ]);
 
         $seguro = SeguroMatricula::findOrFail($id);
 
         if ((int) $seguro->estado === 1) {
-            return response()->json(['message' => 'El seguro ya se encuentra pagado.'], 422);
+            return response()->json([
+                'message' => 'El seguro ya se encuentra pagado.',
+            ], 422);
+        }
+
+        // El seguro es de pago único: no se permite pagar ni un peso menos
+        // ni un peso más del valor registrado en la matrícula.
+        $valorEsperadoCentavos = (int) round(((float) $seguro->valor) * 100);
+        $valorPago = array_key_exists('valor_pago', $validated)
+            ? (float) $validated['valor_pago']
+            : (float) $seguro->valor;
+        $valorPagoCentavos = (int) round($valorPago * 100);
+
+        if ($valorPagoCentavos !== $valorEsperadoCentavos) {
+            return response()->json([
+                'message' => 'El valor del pago debe ser exactamente ' . number_format((float) $seguro->valor, 0, ',', '.') . '. No se permite pagar un valor menor ni mayor al indicado en la matrícula.',
+            ], 422);
         }
 
         $seguro->update([
@@ -138,7 +156,7 @@ class Seguro extends Controller
         ]);
 
         return response()->json([
-            'message' => 'Pago del seguro registrado correctamente.',
+            'message' => 'Pago del seguro registrado correctamente por ' . number_format((float) $seguro->valor, 0, ',', '.') . '.',
             'data' => $seguro->fresh()->load('asignatura.estudiante'),
         ]);
     }
