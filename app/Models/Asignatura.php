@@ -11,6 +11,7 @@ class Asignatura extends Model
 {
     protected $fillable = [
         'estudiante_id',
+        'user_id',
         'año',
         'valor',
         'periodo',
