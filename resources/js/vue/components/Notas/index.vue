@@ -154,7 +154,7 @@ export default {
 <style>
 @page { size: A4; margin: 20mm 18mm; } * { box-sizing: border-box; } body { font-family: Arial, Helvetica, sans-serif; color: #222; margin: 0; font-size: 11px; }
 .certificado { max-width: 780px; margin: 0 auto; } .encabezado { text-align: center; border-bottom: 2px solid #4b6b8a; padding-bottom: 12px; }
-.logo { max-height: 75px; max-width: 150px; margin-bottom: 5px; } .institucion { color: #4b6b8a; font-size: 14px; font-weight: bold; text-transform: uppercase; } .nit { margin-top: 4px; font-size: 10px; }
+.logo { width: 100%; max-width: 100%; height: 75px; object-fit: fill; display: block; margin: 0 auto 5px; } .institucion { color: #4b6b8a; font-size: 14px; font-weight: bold; text-transform: uppercase; } .nit { margin-top: 4px; font-size: 10px; }
 .titulo { text-align: center; margin: 24px 0 18px; font-size: 18px; font-weight: bold; text-transform: uppercase; } .texto { line-height: 1.7; text-align: justify; margin-bottom: 15px; }
 .datos { width: 100%; border-collapse: collapse; margin: 12px 0 18px; } .datos td { padding: 6px 8px; border: 1px solid #d6dde5; } .datos .label { width: 18%; background: #f2f5f8; font-weight: bold; }
 .notas { width: 100%; border-collapse: collapse; margin-top: 12px; } .notas th { background: #eef2f6; font-weight: bold; text-transform: uppercase; } .notas th, .notas td { border: 1px solid #aeb8c2; padding: 7px; text-align: center; } .notas th:first-child, .notas td:first-child { text-align: left; }
