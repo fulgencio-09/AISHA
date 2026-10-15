@@ -6,7 +6,7 @@
                     <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
                         <div>
                             <h5 class="mb-1">Informe de Deudas</h5>
-                            <small class="text-muted">Consulta la cartera pendiente por año y período.</small>
+                            <small class="text-muted">Consulta la cartera pendiente por año, período y semestre.</small>
                         </div>
                         <button class="btn btn-success" type="button" @click="descargarExcel" :disabled="isLoading || descargando">
                             <i class="fa fa-file-excel-o me-1"></i>
@@ -16,19 +16,30 @@
 
                     <div class="filter-box mb-4">
                         <div class="row g-3 align-items-end">
-                            <div class="col-md-3">
+                            <div class="col-md-2">
                                 <label class="form-label">Año</label>
                                 <select v-model="filtros.ano" class="form-select">
                                     <option value="">Todos</option>
                                     <option v-for="ano in anos" :key="ano" :value="ano">{{ ano }}</option>
                                 </select>
                             </div>
-                            <div class="col-md-3">
+                            <div class="col-md-2">
                                 <label class="form-label">Período</label>
                                 <select v-model="filtros.periodo" class="form-select">
                                     <option value="">Todos</option>
                                     <option value="1">1</option>
                                     <option value="2">2</option>
+                                </select>
+                            </div>
+                            <div class="col-md-2">
+                                <label class="form-label">Semestre</label>
+                                <select v-model="filtros.semestre" class="form-select">
+                                    <option value="">Todos</option>
+                                    <option value="1">Introductorio</option>
+                                    <option value="2">Primer semestre</option>
+                                    <option value="3">Segundo semestre</option>
+                                    <option value="4">Tercer semestre</option>
+                                    <option value="5">Cuarto semestre</option>
                                 </select>
                             </div>
                             <div class="col-md-3">
@@ -158,6 +169,7 @@ export default {
             filtros: {
                 ano: '',
                 periodo: '',
+                semestre: '',
                 buscar: '',
                 solo_deuda: true,
             },
@@ -238,7 +250,7 @@ export default {
             }
         },
         limpiar() {
-            this.filtros = { ano: '', periodo: '', buscar: '', solo_deuda: true };
+            this.filtros = { ano: '', periodo: '', semestre: '', buscar: '', solo_deuda: true };
             this.consultar(1);
         },
         async descargarExcel() {
@@ -254,7 +266,7 @@ export default {
                 const url = window.URL.createObjectURL(blob);
                 const enlace = document.createElement('a');
                 enlace.href = url;
-                enlace.download = `informe_deudas_${this.filtros.ano || 'todos'}_${this.filtros.periodo || 'todos'}.xlsx`;
+                enlace.download = `informe_deudas_${this.filtros.ano || 'todos'}_${this.filtros.periodo || 'todos'}_${this.filtros.semestre || 'todos'}.xlsx`;
                 document.body.appendChild(enlace);
                 enlace.click();
                 enlace.remove();
