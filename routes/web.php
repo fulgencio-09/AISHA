@@ -71,6 +71,9 @@ Route::middleware('admin')->group(function(){
     Route::get('/dashboard/semestres', [App\Http\Controllers\HomeController::class, 'semestres']);
 });
 
+// Seguro estudiantil: consulta, registro y pago único.
+Route::resource('/seguro', App\Http\Controllers\Seguro::class)->only(['index', 'store', 'show']);
+Route::post('/seguro/{id}/pagar', [App\Http\Controllers\Seguro::class, 'pagar'])->name('seguro.pagar');
 
 
 });
