@@ -128,7 +128,6 @@ class Notas extends Controller
 
         $not = Asignatura::findOrFail($matricula);
 
-        // La matrícula recibida debe corresponder al semestre seleccionado.
         if ((int) $not->semestre !== $semestre) {
             return response()->json([
                 'message' => 'El semestre seleccionado no corresponde a la matrícula.'
@@ -162,7 +161,6 @@ class Notas extends Controller
                 ],
                 [
                     'materia' => $materia->materia,
-                    'matriculado_en' => now(),
                 ]
             );
         }
