@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Asignatura extends Model
 {
@@ -20,4 +21,8 @@ class Asignatura extends Model
         'sede'
     ];
 
+    public function seguroMatricula(): HasOne
+    {
+        return $this->hasOne(SeguroMatricula::class);
+    }
 }
