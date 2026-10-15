@@ -175,6 +175,10 @@ class Reporte extends Controller
             $query->where('asignaturas.periodo', $request->input('periodo'));
         }
 
+        if ($request->filled('semestre')) {
+            $query->where('asignaturas.semestre', $request->input('semestre'));
+        }
+
         if ($request->filled('buscar')) {
             $buscar = trim($request->input('buscar'));
             $query->where(function ($q) use ($buscar) {
@@ -311,7 +315,7 @@ class Reporte extends Controller
 
         $sheet->getStyle('H2:H' . max(2, $row - 1))->getFont()->setBold(true);
 
-        $nombre = 'informe_deudas_' . ($request->input('ano') ?: 'todos') . '_' . ($request->input('periodo') ?: 'todos') . '.xlsx';
+        $nombre = 'informe_deudas_' . ($request->input('ano') ?: 'todos') . '_' . ($request->input('periodo') ?: 'todos') . '_' . ($request->input('semestre') ?: 'todos') . '.xlsx';
         $writer = new Xlsx($spreadsheet);
 
         return response()->streamDownload(function () use ($writer) {
