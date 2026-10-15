@@ -59,7 +59,9 @@ class Seguro extends Controller
             }
         }
 
-        $matriculas = $query->orderByDesc('id')->paginate(20);
+        // Paginación del módulo. Por defecto 10 registros por página.
+        $porPagina = min(max((int) $request->input('per_page', 10), 1), 50);
+        $matriculas = $query->orderByDesc('id')->paginate($porPagina)->withQueryString();
 
         $matriculas->getCollection()->transform(function ($asignatura) {
             $seguro = $asignatura->seguroMatricula;
