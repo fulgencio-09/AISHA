@@ -117,9 +117,7 @@ class Abonos extends Controller
             )
             ->get();
 
-        return [
-            'abono' => $abono,
-        ];
+        return ['abono' => $abono];
     }
 
     public function credito(Request $request, $id)
@@ -139,9 +137,7 @@ class Abonos extends Controller
             )
             ->get();
 
-        return [
-            'cred' => $cred,
-        ];
+        return ['cred' => $cred];
     }
 
     public function buscar(Request $request)
@@ -155,9 +151,7 @@ class Abonos extends Controller
             ->orderBy('id', 'desc')
             ->paginate(5);
 
-        return [
-            'abono' => $abono,
-        ];
+        return ['abono' => $abono];
     }
 
     public function busca(Request $request)
@@ -233,9 +227,7 @@ class Abonos extends Controller
 
         Abono::findOrFail($debitado->id)->delete();
 
-        return [
-            'debitado' => $debitado,
-        ];
+        return ['debitado' => $debitado];
     }
 
     public function store(Request $request)
@@ -245,36 +237,41 @@ class Abonos extends Controller
         $cantidad = (float) ($input['cantidad'] ?? 0);
 
         if (!$asignatura_id || $cantidad <= 0) {
-            return response()->json('no', 422);
+            return response()->json([
+                'message' => 'Debe seleccionar una matrícula y registrar una cantidad mayor que cero.'
+            ], 422);
         }
 
-        // La matrícula (asignatura_id) es la fuente de verdad para año,
-        // período y semestre. No se permite aplicar el pago a otra matrícula.
         $asignatura = Asignatura::where('id', $asignatura_id)
             ->where('estado', 1)
             ->first();
 
         if (!$asignatura) {
-            return response()->json('no', 404);
+            return response()->json([
+                'message' => 'La matrícula seleccionada no está disponible para realizar el abono.'
+            ], 404);
         }
 
-        // Regla financiera: antes de realizar cualquier abono a la matrícula,
-        // el seguro estudiantil asociado a esa matrícula debe estar registrado
-        // y completamente pagado.
         $seguro = SeguroMatricula::where('asignatura_id', $asignatura->id)->first();
 
-        if (!$seguro || (int) $seguro->estado !== 1) {
+        if (!$seguro) {
+            return response()->json([
+                'message' => 'La matrícula no tiene un seguro estudiantil registrado. Primero debe registrar el seguro.'
+            ], 422);
+        }
+
+        if ((int) $seguro->estado !== 1) {
             return response()->json([
                 'message' => 'No se puede realizar el abono. Primero debe pagarse el seguro estudiantil de la matrícula.'
             ], 422);
         }
 
         if ($cantidad > (float) $asignatura->valor) {
-            return response()->json('no');
+            return response()->json([
+                'message' => 'El valor del abono no puede ser mayor que el saldo pendiente de la matrícula.'
+            ], 422);
         }
 
-        // Guardamos en el abono solamente la referencia a la matrícula.
-        // Año, período y semestre permanecen normalizados en asignaturas.
         $input['asignatura_id'] = $asignatura->id;
         $input['semestre'] = $asignatura->semestre;
         $input['deuda'] = (float) $asignatura->valor - $cantidad;
@@ -284,7 +281,10 @@ class Abonos extends Controller
         $asignatura->valor = (float) $asignatura->valor - $cantidad;
         $asignatura->save();
 
-        return ['input' => $input];
+        return response()->json([
+            'message' => 'Abono registrado correctamente.',
+            'data' => $input,
+        ]);
     }
 
     public function show(Request $request)
