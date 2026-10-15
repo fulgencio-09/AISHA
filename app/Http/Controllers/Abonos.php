@@ -9,6 +9,7 @@ use App\Models\Abono;
 use App\Models\Asignatura;
 use App\Models\Estudiante;
 use App\Models\Respaldo;
+use App\Models\SeguroMatricula;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Storage;
@@ -255,6 +256,17 @@ class Abonos extends Controller
 
         if (!$asignatura) {
             return response()->json('no', 404);
+        }
+
+        // Regla financiera: antes de realizar cualquier abono a la matrícula,
+        // el seguro estudiantil asociado a esa matrícula debe estar registrado
+        // y completamente pagado.
+        $seguro = SeguroMatricula::where('asignatura_id', $asignatura->id)->first();
+
+        if (!$seguro || (int) $seguro->estado !== 1) {
+            return response()->json([
+                'message' => 'No se puede realizar el abono. Primero debe pagarse el seguro estudiantil de la matrícula.'
+            ], 422);
         }
 
         if ($cantidad > (float) $asignatura->valor) {
