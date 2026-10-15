@@ -71,6 +71,10 @@ Route::middleware('admin')->group(function(){
     Route::get('/dashboard/semestres', [App\Http\Controllers\HomeController::class, 'semestres']);
 });
 
+// Ruta del shell de Vue: permite entrar o refrescar directamente /seguro/index.
+// Debe estar antes del resource porque /seguro/{seguro} interpretaría "index" como un ID.
+Route::get('/seguro/index', [App\Http\Controllers\HomeController::class, 'index'])->name('seguro.frontend');
+
 // Seguro estudiantil: consulta, registro y pago único.
 Route::resource('/seguro', App\Http\Controllers\Seguro::class)->only(['index', 'store', 'show']);
 Route::post('/seguro/{id}/pagar', [App\Http\Controllers\Seguro::class, 'pagar'])->name('seguro.pagar');
