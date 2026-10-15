@@ -73,7 +73,7 @@ class Notas extends Controller
     {
         $data = $request->validate([
             'semestre' => 'required|integer|min:1|max:5',
-            'materias_id' => 'required|integer|exists:materias,id',
+            'materia_id' => 'required|integer|exists:materias,id',
             'asignatura_id' => 'required|integer|exists:asignaturas,id',
             'materia' => 'required|string|max:255',
             'corte1' => 'nullable|numeric|min:0|max:5',
@@ -126,23 +126,25 @@ class Notas extends Controller
         $semestre = (int) $request->semestre;
         $userId = Auth::id();
 
-        $not = Asignatura::findOrFail($matricula);
+        if (!$userId) {
+            return response()->json([
+                'message' => 'No se pudo identificar el usuario que realiza la operación.'
+            ], 401);
+        }
 
-        if ((int) $not->semestre !== $semestre) {
+        $asignatura = Asignatura::findOrFail($matricula);
+
+        if ((int) $asignatura->semestre !== $semestre) {
             return response()->json([
                 'message' => 'El semestre seleccionado no corresponde a la matrícula.'
             ], 422);
         }
 
-        $materias = Asignatura::join('materias', 'asignaturas.semestre', '=', 'materias.semestre')
-            ->where('asignaturas.id', '=', $matricula)
-            ->where('asignaturas.semestre', '=', $semestre)
-            ->select(
-                'asignaturas.semestre',
-                'asignaturas.id as asignatura_id',
-                'materias.id as materia_id',
-                'materias.materia'
-            )
+        // Las materias se obtienen de la tabla materias según el semestre.
+        // materia_id guarda exactamente el id de la materia relacionada.
+        $materias = \App\Models\Materia::where('semestre', $semestre)
+            ->select('id as materia_id', 'materia')
+            ->orderBy('id')
             ->get();
 
         if ($materias->isEmpty()) {
@@ -152,21 +154,24 @@ class Notas extends Controller
         }
 
         foreach ($materias as $materia) {
-            Nota::updateOrCreate(
-                [
-                    'user_id' => $userId,
-                    'asignatura_id' => $materia->asignatura_id,
-                    'materia_id' => $materia->materia_id,
-                    'semestre' => $materia->semestre,
-                ],
-                [
-                    'materia' => $materia->materia,
-                ]
-            );
+            $nota = Nota::firstOrNew([
+                'asignatura_id' => $asignatura->id,
+                'materia_id' => $materia->materia_id,
+                'semestre' => $asignatura->semestre,
+            ]);
+
+            // Si el registro ya existía y no tenía usuario, se completa con
+            // el usuario autenticado que está ejecutando la operación.
+            if (!$nota->exists || empty($nota->user_id)) {
+                $nota->user_id = $userId;
+            }
+
+            $nota->materia = $materia->materia;
+            $nota->save();
         }
 
-        $not->mat_matr = 'Si';
-        $not->save();
+        $asignatura->mat_matr = 'Si';
+        $asignatura->save();
 
         return response()->json([
             'message' => 'Materias agregadas correctamente.',
