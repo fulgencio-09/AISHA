@@ -11,7 +11,7 @@
         </div>
 
         <div class="row g-3 mb-4">
-            <div class="col-md-4"><div class="card border-0 shadow-sm h-100"><div class="card-body d-flex justify-content-between align-items-center"><div><small class="text-muted d-block">Matrículas consultadas</small><h3 class="mb-0">{{ seguros.length }}</h3></div><span class="seguro-icon bg-primary-subtle text-primary"><i class="fa fa-list"></i></span></div></div></div>
+            <div class="col-md-4"><div class="card border-0 shadow-sm h-100"><div class="card-body d-flex justify-content-between align-items-center"><div><small class="text-muted d-block">Matrículas consultadas</small><h3 class="mb-0">{{ meta.total }}</h3></div><span class="seguro-icon bg-primary-subtle text-primary"><i class="fa fa-list"></i></span></div></div></div>
             <div class="col-md-4"><div class="card border-0 shadow-sm h-100"><div class="card-body d-flex justify-content-between align-items-center"><div><small class="text-muted d-block">Pendientes</small><h3 class="mb-0 text-warning">{{ pendientes }}</h3></div><span class="seguro-icon bg-warning-subtle text-warning"><i class="fa fa-clock-o"></i></span></div></div></div>
             <div class="col-md-4"><div class="card border-0 shadow-sm h-100"><div class="card-body d-flex justify-content-between align-items-center"><div><small class="text-muted d-block">Pagados</small><h3 class="mb-0 text-success">{{ pagados }}</h3></div><span class="seguro-icon bg-success-subtle text-success"><i class="fa fa-check-circle"></i></span></div></div></div>
         </div>
@@ -30,7 +30,10 @@
         </div>
 
         <div class="card border-0 shadow-sm">
-            <div class="card-header bg-white d-flex justify-content-between align-items-center"><strong>Matrículas / Seguro Estudiantil</strong><span class="text-muted small" v-if="meta.total">Total: {{ meta.total }}</span></div>
+            <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                <strong>Matrículas / Seguro Estudiantil</strong>
+                <span class="text-muted small">Total: {{ meta.total }}</span>
+            </div>
             <div v-if="cargando" class="text-center py-5"><i class="fa fa-spinner fa-spin fa-2x text-primary"></i><div class="mt-2 text-muted">Cargando matrículas...</div></div>
             <div v-else class="table-responsive">
                 <table class="table table-hover align-middle mb-0">
@@ -52,7 +55,27 @@
                     </tbody>
                 </table>
             </div>
-            <div v-if="meta.last_page > 1" class="card-footer bg-white"><nav><ul class="pagination pagination-sm mb-0 justify-content-end"><li class="page-item" :class="{disabled: meta.current_page === 1}"><button class="page-link" @click="cambiarPagina(meta.current_page-1)">Anterior</button></li><li v-for="pagina in meta.last_page" :key="pagina" class="page-item" :class="{active: pagina === meta.current_page}"><button class="page-link" @click="cambiarPagina(pagina)">{{ pagina }}</button></li><li class="page-item" :class="{disabled: meta.current_page === meta.last_page}"><button class="page-link" @click="cambiarPagina(meta.current_page+1)">Siguiente</button></li></ul></nav></div>
+
+            <div class="card-footer bg-white">
+                <div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
+                    <div class="text-muted small">
+                        Página {{ meta.current_page }} de {{ meta.last_page }} · Mostrando {{ desdeRegistro }}-{{ hastaRegistro }} de {{ meta.total }}
+                    </div>
+                    <nav aria-label="Paginación de seguros">
+                        <ul class="pagination pagination-sm mb-0">
+                            <li class="page-item" :class="{ disabled: meta.current_page === 1 }">
+                                <button class="page-link" :disabled="meta.current_page === 1" @click="cambiarPagina(meta.current_page - 1)">Anterior</button>
+                            </li>
+                            <li v-for="pagina in paginasVisibles" :key="pagina" class="page-item" :class="{ active: pagina === meta.current_page }">
+                                <button class="page-link" @click="cambiarPagina(pagina)">{{ pagina }}</button>
+                            </li>
+                            <li class="page-item" :class="{ disabled: meta.current_page === meta.last_page }">
+                                <button class="page-link" :disabled="meta.current_page === meta.last_page" @click="cambiarPagina(meta.current_page + 1)">Siguiente</button>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+            </div>
         </div>
 
         <div v-if="modalRegistro" class="seguro-modal-backdrop" @click.self="cerrarRegistro">
@@ -87,28 +110,51 @@ export default {
     name: 'SeguroEstudiantil',
     data() {
         return {
-            seguros: [], cargando: false, guardando: false, modalRegistro: false, modalPago: false, seguroSeleccionado: null,
+            seguros: [],
+            cargando: false,
+            guardando: false,
+            modalRegistro: false,
+            modalPago: false,
+            seguroSeleccionado: null,
             filtros: { buscar: '', ano: '', periodo: '', semestre: '', estado: '' },
             formRegistro: { valor: '', observacion: '' },
             form: { fecha_pago: this.fechaHoy(), forma_pago: '', referencia: '', observacion: '' },
-            meta: { current_page: 1, last_page: 1, total: 0 },
+            meta: { current_page: 1, last_page: 1, total: 0, per_page: 10, from: 0, to: 0 },
         };
     },
     computed: {
         pendientes() { return this.seguros.filter(item => item.seguro_registrado && !Boolean(item.estado)).length; },
         pagados() { return this.seguros.filter(item => item.seguro_registrado && Boolean(item.estado)).length; },
+        desdeRegistro() { return this.meta.total === 0 ? 0 : (this.meta.from || ((this.meta.current_page - 1) * this.meta.per_page + 1)); },
+        hastaRegistro() { return this.meta.to || 0; },
+        paginasVisibles() {
+            const total = this.meta.last_page || 1;
+            const actual = this.meta.current_page || 1;
+            const inicio = Math.max(1, Math.min(actual - 2, total - 4));
+            const fin = Math.min(total, inicio + 4);
+            const paginas = [];
+            for (let i = inicio; i <= fin; i++) paginas.push(i);
+            return paginas;
+        },
     },
     mounted() { this.cargarSeguros(); },
     methods: {
         fechaHoy() { const f = new Date(); return `${f.getFullYear()}-${String(f.getMonth()+1).padStart(2,'0')}-${String(f.getDate()).padStart(2,'0')}`; },
         cargarSeguros(pagina = 1) {
             this.cargando = true;
-            const params = { page: pagina };
+            const params = { page: pagina, per_page: 10 };
             Object.keys(this.filtros).forEach(k => { if (this.filtros[k] !== '' && this.filtros[k] !== null) params[k] = this.filtros[k]; });
             axios.get('/seguro', { params }).then(response => {
                 const data = response.data || {};
                 this.seguros = data.data || [];
-                this.meta = { current_page: data.current_page || 1, last_page: data.last_page || 1, total: data.total || 0 };
+                this.meta = {
+                    current_page: data.current_page || 1,
+                    last_page: data.last_page || 1,
+                    total: data.total || 0,
+                    per_page: data.per_page || 10,
+                    from: data.from || 0,
+                    to: data.to || 0,
+                };
             }).catch(error => { this.seguros = []; this.mostrarError(error, 'No fue posible consultar las matrículas.'); }).finally(() => { this.cargando = false; });
         },
         buscar() { this.cargarSeguros(1); },
@@ -130,9 +176,18 @@ export default {
             if (!this.form.fecha_pago || !this.form.forma_pago) { this.mostrarError(null, 'La fecha y la forma de pago son obligatorias.'); return; }
             if (!window.confirm('¿Confirma que desea registrar el pago único de este seguro?')) return;
             this.guardando = true;
-            axios.post(`/seguro/${this.seguroSeleccionado.id}/pagar`, this.form).then(response => { this.mostrarExito(response.data?.message || 'Pago registrado correctamente.'); this.cerrarModal(); this.cargarSeguros(this.meta.current_page); }).catch(error => { this.mostrarError(error, error.response?.data?.message || 'No fue posible registrar el pago.'); }).finally(() => { this.guardando = false; });
+            axios.post(`/seguro/${this.seguroSeleccionado.id}/pagar`, this.form).then(response => {
+                this.mostrarExito(response.data?.message || 'Pago registrado correctamente.');
+                this.cerrarModal();
+                this.cargarSeguros(this.meta.current_page);
+            }).catch(error => { this.mostrarError(error, error.response?.data?.message || 'No fue posible registrar el pago.'); }).finally(() => { this.guardando = false; });
         },
-        verPago(seguro) { window.alert(`Seguro pagado\n\nFecha: ${seguro.fecha_pago || 'No registrada'}\nForma de pago: ${seguro.forma_pago || 'No registrada'}\nReferencia: ${seguro.referencia || 'Sin referencia'}`); },
+        verPago(seguro) {
+            const fecha = seguro.fecha_pago || 'No registrada';
+            const forma = seguro.forma_pago || 'No registrada';
+            const referencia = seguro.referencia || 'Sin referencia';
+            window.alert(`Seguro pagado\n\nFecha: ${fecha}\nForma de pago: ${forma}\nReferencia: ${referencia}`);
+        },
         asignatura(seguro) { return seguro?.asignatura || {}; },
         estudiante(seguro) { return this.asignatura(seguro).estudiante || {}; },
         moneda(valor) { return new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', maximumFractionDigits: 0 }).format(Number(valor || 0)); },
