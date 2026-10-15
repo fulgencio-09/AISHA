@@ -15,22 +15,31 @@ import Reporte from './components/Reporte/index.vue';
 import Informe from './components/Reporte/relacion.vue';
 import Password from './components/user/contrasena.vue';
 
-// Todas las alertas nativas del sistema se muestran mediante Toastr.
-// Esto permite mantener un único mecanismo visual para los mensajes.
+// Unificar las alertas nativas del sistema mediante Toastr.
 window.__toastrErrorMessage = null;
 window.alert = function (message) {
+  const esErrorBackend = !!window.__toastrErrorMessage;
   const mensaje = window.__toastrErrorMessage || message || 'Ha ocurrido un error.';
   window.__toastrErrorMessage = null;
 
-  if (window.toastr) {
-    window.toastr.error(mensaje);
-  } else {
+  if (!window.toastr) {
     console.error(mensaje);
+    return;
+  }
+
+  if (esErrorBackend || /error|no se puede|no fue posible|falló|fallo/i.test(mensaje)) {
+    window.toastr.error(mensaje);
+  } else if (/éxito|exitosamente|guardado|actualizado|enviado|correctamente/i.test(mensaje)) {
+    window.toastr.success(mensaje);
+  } else if (/advertencia|pendiente|debe|obligatorio/i.test(mensaje)) {
+    window.toastr.warning(mensaje);
+  } else {
+    window.toastr.info(mensaje);
   }
 };
 
-// Captura los mensajes enviados por Laravel en errores HTTP para que
-// cualquier componente que use alert() pueda mostrar el mensaje real mediante Toastr.
+// Capturar automáticamente los mensajes enviados por Laravel en errores HTTP.
+// Así el mensaje real del backend llega a Toastr aunque el componente use alert().
 if (typeof axios !== 'undefined') {
   axios.interceptors.response.use(
     response => response,
