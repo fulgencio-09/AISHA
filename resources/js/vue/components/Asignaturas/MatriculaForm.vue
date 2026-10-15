@@ -1,155 +1,219 @@
 <template>
-    <main class="main" id="main">
+    <main class="main matricula-page" id="main">
         <div class="container-fluid">
-            <div class="row">
-                <div class="card shadow mb-4">
-                    <div class="text-white text-center p-2">
-                        <h6 class="text-white p-2 border col-12" style="background-color: tomato;">
-                            Matriculas Academicas
-                        </h6>
-                    </div>
-
-                    <div class="card-body" style="font-size: small;">
-                        <div v-for="datos in estudiante" :key="datos.id" class="mb-3">
-                            <div class="row mb-2">
-                                <div class="col-sm-4"><strong>T.I:</strong> {{ datos.tipo }}</div>
-                                <div class="col-sm-4"><strong>Documento:</strong> {{ datos.documento }}</div>
-                                <div class="col-sm-4"><strong>Nombre:</strong> {{ datos.name }}</div>
-                            </div>
-                        </div>
-                        <hr>
-
-                        <div class="row g-3 mb-3">
-                            <div class="col-12 col-sm-3 input-group-sm">
-                                <label class="form-label">Año lectivo</label>
-                                <select v-model="form.ano" class="form-select" :disabled="modoEdicion">
-                                    <option value="">Seleccione</option>
-                                    <option v-for="item in date" :key="item" :value="item">{{ item }}</option>
-                                </select>
-                            </div>
-
-                            <div class="col-12 col-sm-3 input-group-sm">
-                                <label class="form-label">Periodo</label>
-                                <select v-model="form.periodo" class="form-select" :disabled="modoEdicion">
-                                    <option value="">Seleccione</option>
-                                    <option value="1">Primer periodo anual</option>
-                                    <option value="2">Segundo periodo anual</option>
-                                </select>
-                            </div>
-
-                            <div class="col-12 col-sm-3 input-group-sm">
-                                <label class="form-label">Semestre</label>
-                                <select v-model="form.semestre" class="form-select" :disabled="modoEdicion">
-                                    <option value="">Seleccione</option>
-                                    <option value="1">Introductorio</option>
-                                    <option value="2">Primer Semestre</option>
-                                    <option value="3">Segundo Semestre</option>
-                                    <option value="4">Tercer Semestre</option>
-                                    <option value="5">Cuarto Semestre</option>
-                                </select>
-                            </div>
-
-                            <div class="col-12 col-sm-3 input-group-sm">
-                                <label class="form-label">Sede</label>
-                                <select v-model="form.sede" class="form-select">
-                                    <option value="">Seleccione</option>
-                                    <option value="Riohacha">Riohacha</option>
-                                    <option value="Fonseca">Fonseca</option>
-                                </select>
-                            </div>
-
-                            <div class="col-12 col-sm-3 input-group-sm">
-                                <label class="form-label">V. total Matrícula</label>
-                                <input type="text" class="form-control" placeholder="$"
-                                    :value="precioFormateado" @input="actualizarPrecio" />
-                            </div>
-
-                            <div class="col-12 col-sm-3 input-group-sm">
-                                <label class="form-label">Valor Seguro Estudiantil <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control" placeholder="$"
-                                    :value="seguroFormateado" @input="actualizarSeguro"
-                                    :disabled="modoEdicion" />
-                                <small class="text-muted">
-                                    Se crea automáticamente como pendiente al guardar la matrícula.
-                                </small>
-                            </div>
-                        </div>
-
-                        <div class="d-flex justify-content-end gap-2">
-                            <button v-if="!modoEdicion" @click.prevent="guardar" class="btn btn-outline-success btn-sm">
-                                <i class="fa fa-floppy-o"></i> Guardar
-                            </button>
-                            <button v-if="modoEdicion" @click.prevent="actualizar" class="btn btn-outline-info btn-sm">
-                                <i class="fa fa-refresh"></i> Actualizar
-                            </button>
-                            <button v-if="modoEdicion" @click.prevent="cancelarEdicion" class="btn btn-outline-danger btn-sm">
-                                <i class="bx bx-window-close"></i> Cancelar
-                            </button>
-                        </div>
-                    </div>
+            <div class="matricula-header d-flex flex-wrap justify-content-between align-items-center mb-4">
+                <div>
+                    <h4 class="mb-1"><i class="fa fa-graduation-cap me-2"></i>Matriculas Académicas</h4>
+                    <p class="text-muted mb-0">Gestión de matrículas académicas y valores asociados al estudiante.</p>
                 </div>
-
-                <div class="card col-md-12 mt-2">
-                    <div class="card-body">
-                        <h6 class="text-white p-2 border col-12" style="background-color: tomato;">
-                            Matriculas Anteriores
-                        </h6>
-
-                        <div class="table-responsive text-nowrap">
-                            <table class="table table-bordered">
-                                <thead>
-                                    <tr>
-                                        <th>Sede</th>
-                                        <th>Año</th>
-                                        <th>Semestre</th>
-                                        <th>Periodo</th>
-                                        <th>Saldo Matrícula</th>
-                                        <th>Saldo Pendiente</th>
-                                        <th>Acciones</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr v-for="item in matriculas.data" :key="item.id">
-                                        <td>{{ item.sede }}</td>
-                                        <td>{{ item.año }}</td>
-                                        <td>{{ nombreSemestre(item.semestre) }}</td>
-                                        <td>{{ item.periodo }}</td>
-                                        <td>{{ formatoCOP(item.total) }}</td>
-                                        <td>{{ formatoCOP(item.valor) }}</td>
-                                        <td v-if="esAdmin">
-                                            <button @click="editar(item)" class="btn btn-warning btn-sm" title="Editar">
-                                                <i class="fa fa-pencil"></i>
-                                            </button>
-                                        </td>
-                                        <td v-else>-</td>
-                                    </tr>
-                                    <tr v-if="!matriculas.data || matriculas.data.length === 0">
-                                        <td colspan="7" class="text-center text-muted">No hay matrículas registradas.</td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-
-                        <div v-if="pagination.last_page > 1" class="d-flex justify-content-center mt-3">
-                            <nav aria-label="Paginación de matrículas">
-                                <ul class="pagination pagination-sm mb-0">
-                                    <li class="page-item" :class="{ disabled: pagination.current_page === 1 }">
-                                        <a class="page-link" href="#" @click.prevent="cambiarPagina(pagination.current_page - 1)">Anterior</a>
-                                    </li>
-                                    <li v-for="page in paginas" :key="page" class="page-item" :class="{ active: page === pagination.current_page }">
-                                        <a class="page-link" href="#" @click.prevent="cambiarPagina(page)">{{ page }}</a>
-                                    </li>
-                                    <li class="page-item" :class="{ disabled: pagination.current_page === pagination.last_page }">
-                                        <a class="page-link" href="#" @click.prevent="cambiarPagina(pagination.current_page + 1)">Siguiente</a>
-                                    </li>
-                                </ul>
-                            </nav>
-                        </div>
-                    </div>
-                </div>
-
-                <loading v-model:active="isLoading" :is-full-page="true" />
+                <button v-if="!modoEdicion" class="btn btn-primary" @click="cargar(1)">
+                    <i class="fa fa-refresh me-1"></i> Actualizar
+                </button>
             </div>
+
+            <div class="row g-3 mb-4">
+                <div class="col-md-4">
+                    <div class="card matricula-stat border-0 shadow-sm h-100">
+                        <div class="card-body d-flex justify-content-between align-items-center">
+                            <div>
+                                <small class="text-muted d-block">Matrículas registradas</small>
+                                <h3 class="mb-0">{{ pagination.total }}</h3>
+                            </div>
+                            <span class="matricula-icon bg-primary-subtle text-primary"><i class="fa fa-list"></i></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card matricula-stat border-0 shadow-sm h-100">
+                        <div class="card-body d-flex justify-content-between align-items-center">
+                            <div>
+                                <small class="text-muted d-block">Estudiante</small>
+                                <h6 class="mb-0 text-truncate" style="max-width: 240px;">{{ estudiante[0]?.name || 'Sin estudiante' }}</h6>
+                            </div>
+                            <span class="matricula-icon bg-info-subtle text-info"><i class="fa fa-user"></i></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card matricula-stat border-0 shadow-sm h-100">
+                        <div class="card-body d-flex justify-content-between align-items-center">
+                            <div>
+                                <small class="text-muted d-block">Documento</small>
+                                <h6 class="mb-0">{{ estudiante[0]?.documento || '—' }}</h6>
+                            </div>
+                            <span class="matricula-icon bg-success-subtle text-success"><i class="fa fa-id-card"></i></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-white border-0 d-flex justify-content-between align-items-center">
+                    <div>
+                        <strong>{{ modoEdicion ? 'Editar matrícula' : 'Nueva matrícula' }}</strong>
+                        <div class="small text-muted">Complete la información académica y financiera.</div>
+                    </div>
+                    <span v-if="modoEdicion" class="badge bg-warning-subtle text-warning">Modo edición</span>
+                </div>
+                <div class="card-body">
+                    <div class="matricula-student-box mb-4" v-if="estudiante.length">
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <small class="text-muted d-block">Tipo de documento</small>
+                                <strong>{{ estudiante[0].tipo || '—' }}</strong>
+                            </div>
+                            <div class="col-md-4">
+                                <small class="text-muted d-block">Documento</small>
+                                <strong>{{ estudiante[0].documento || '—' }}</strong>
+                            </div>
+                            <div class="col-md-4">
+                                <small class="text-muted d-block">Nombre y apellidos</small>
+                                <strong>{{ estudiante[0].name || '—' }}</strong>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row g-3 align-items-end">
+                        <div class="col-md-3">
+                            <label class="form-label">Año lectivo</label>
+                            <select v-model="form.ano" class="form-select" :disabled="modoEdicion">
+                                <option value="">Seleccione</option>
+                                <option v-for="item in date" :key="item" :value="item">{{ item }}</option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-3">
+                            <label class="form-label">Periodo</label>
+                            <select v-model="form.periodo" class="form-select" :disabled="modoEdicion">
+                                <option value="">Seleccione</option>
+                                <option value="1">Primer periodo anual</option>
+                                <option value="2">Segundo periodo anual</option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-3">
+                            <label class="form-label">Semestre</label>
+                            <select v-model="form.semestre" class="form-select" :disabled="modoEdicion">
+                                <option value="">Seleccione</option>
+                                <option value="1">Introductorio</option>
+                                <option value="2">Primer Semestre</option>
+                                <option value="3">Segundo Semestre</option>
+                                <option value="4">Tercer Semestre</option>
+                                <option value="5">Cuarto Semestre</option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-3">
+                            <label class="form-label">Sede</label>
+                            <select v-model="form.sede" class="form-select">
+                                <option value="">Seleccione</option>
+                                <option value="Riohacha">Riohacha</option>
+                                <option value="Fonseca">Fonseca</option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-3">
+                            <label class="form-label">Valor total matrícula</label>
+                            <div class="input-group">
+                                <span class="input-group-text">$</span>
+                                <input type="text" class="form-control" placeholder="0" :value="precioFormateado" @input="actualizarPrecio" />
+                            </div>
+                        </div>
+
+                        <div class="col-md-3">
+                            <label class="form-label">Valor seguro estudiantil <span class="text-danger">*</span></label>
+                            <div class="input-group">
+                                <span class="input-group-text">$</span>
+                                <input type="text" class="form-control" placeholder="0" :value="seguroFormateado" @input="actualizarSeguro" :disabled="modoEdicion" />
+                            </div>
+                            <small class="text-muted">Se crea automáticamente como pendiente al guardar.</small>
+                        </div>
+                    </div>
+
+                    <div class="mt-4 pt-3 border-top d-flex justify-content-end gap-2">
+                        <button v-if="modoEdicion" @click.prevent="cancelarEdicion" class="btn btn-outline-secondary btn-sm">
+                            <i class="fa fa-times me-1"></i> Cancelar
+                        </button>
+                        <button v-if="!modoEdicion" @click.prevent="guardar" class="btn btn-success btn-sm">
+                            <i class="fa fa-floppy-o me-1"></i> Guardar matrícula
+                        </button>
+                        <button v-if="modoEdicion" @click.prevent="actualizar" class="btn btn-primary btn-sm">
+                            <i class="fa fa-refresh me-1"></i> Actualizar matrícula
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                    <div>
+                        <strong>Matriculas Anteriores</strong>
+                        <div class="small text-muted">Historial académico y saldo de matrícula.</div>
+                    </div>
+                    <span class="text-muted small">Total: {{ pagination.total }}</span>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Sede</th>
+                                <th>Año</th>
+                                <th>Semestre</th>
+                                <th>Periodo</th>
+                                <th>Saldo matrícula</th>
+                                <th>Saldo pendiente</th>
+                                <th class="text-center">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr v-for="item in matriculas.data" :key="item.id">
+                                <td>{{ item.sede || '—' }}</td>
+                                <td>{{ item.año || '—' }}</td>
+                                <td>{{ nombreSemestre(item.semestre) }}</td>
+                                <td>{{ item.periodo || '—' }}</td>
+                                <td class="fw-semibold">{{ formatoCOP(item.total) }}</td>
+                                <td class="fw-semibold">{{ formatoCOP(item.valor) }}</td>
+                                <td class="text-center">
+                                    <button v-if="esAdmin" @click="editar(item)" class="btn btn-sm btn-outline-primary" title="Editar">
+                                        <i class="fa fa-pencil"></i>
+                                    </button>
+                                    <span v-else class="text-muted">—</span>
+                                </td>
+                            </tr>
+                            <tr v-if="!matriculas.data || matriculas.data.length === 0">
+                                <td colspan="7" class="text-center py-5 text-muted">
+                                    <i class="fa fa-graduation-cap fa-2x mb-2 d-block"></i>
+                                    No hay matrículas registradas.
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="card-footer bg-white" v-if="pagination.last_page > 1">
+                    <div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
+                        <div class="text-muted small">
+                            Página {{ pagination.current_page }} de {{ pagination.last_page }} · Mostrando {{ pagination.from }}-{{ pagination.to }} de {{ pagination.total }}
+                        </div>
+                        <nav aria-label="Paginación de matrículas">
+                            <ul class="pagination pagination-sm mb-0">
+                                <li class="page-item" :class="{ disabled: pagination.current_page === 1 }">
+                                    <button class="page-link" :disabled="pagination.current_page === 1" @click="cambiarPagina(pagination.current_page - 1)">Anterior</button>
+                                </li>
+                                <li v-for="page in paginas" :key="page" class="page-item" :class="{ active: page === pagination.current_page }">
+                                    <button class="page-link" @click="cambiarPagina(page)">{{ page }}</button>
+                                </li>
+                                <li class="page-item" :class="{ disabled: pagination.current_page === pagination.last_page }">
+                                    <button class="page-link" :disabled="pagination.current_page === pagination.last_page" @click="cambiarPagina(pagination.current_page + 1)">Siguiente</button>
+                                </li>
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+
+            <loading v-model:active="isLoading" :is-full-page="true" />
         </div>
     </main>
 </template>
@@ -370,3 +434,119 @@ export default {
     },
 };
 </script>
+
+<style scoped>
+.matricula-page {
+    padding: 6px 0 30px;
+}
+
+.matricula-header h4 {
+    font-weight: 600;
+    color: #344054;
+}
+
+.matricula-header p {
+    font-size: 13px;
+}
+
+.matricula-page .card {
+    border-radius: 10px;
+}
+
+.matricula-stat {
+    transition: transform .2s ease, box-shadow .2s ease;
+}
+
+.matricula-stat:hover {
+    transform: translateY(-2px);
+}
+
+.matricula-icon {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 17px;
+}
+
+.matricula-page .card-header {
+    padding: 18px 20px;
+}
+
+.matricula-page .card-body {
+    padding: 20px;
+}
+
+.matricula-page .form-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: #667085;
+    text-transform: uppercase;
+    letter-spacing: .02em;
+}
+
+.matricula-page .form-control,
+.matricula-page .form-select,
+.matricula-page .input-group-text {
+    min-height: 38px;
+    border-color: #d0d5dd;
+    font-size: 13px;
+}
+
+.matricula-page .input-group-text {
+    background: #f8f9fa;
+    color: #667085;
+}
+
+.matricula-student-box {
+    padding: 15px 18px;
+    border: 1px solid #e4e7ec;
+    border-radius: 8px;
+    background: #f8fafc;
+}
+
+.matricula-student-box small {
+    font-size: 11px;
+}
+
+.matricula-page .table thead th {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: .06em;
+    color: #667085;
+    white-space: nowrap;
+    padding: 13px 15px;
+    border-bottom: 1px solid #e4e7ec;
+}
+
+.matricula-page .table tbody td {
+    font-size: 13px;
+    padding: 13px 15px;
+    color: #475467;
+}
+
+.matricula-page .table tbody tr:hover {
+    background: #f8fafc;
+}
+
+.matricula-page .btn {
+    border-radius: 6px;
+}
+
+.matricula-page .pagination .page-link {
+    border-radius: 5px;
+    margin: 0 2px;
+}
+
+@media (max-width: 768px) {
+    .matricula-header {
+        gap: 15px;
+    }
+
+    .matricula-header .btn {
+        width: 100%;
+    }
+}
+</style>
