@@ -35,7 +35,7 @@
                                         title="Imprimir">
                                         <i class="fa fa-print"></i>
                                     </button>
-                                    <button v-if="items.mat_matr === 'No'" @click="materia(items)"
+                                    <button v-if="!tieneMaterias(items)" @click="materia(items)"
                                         class="btn btn-info btn-sm action-btn" title="Agregar Materia">
                                         <i class="fa fa-file-text" aria-hidden="true"></i>
                                     </button>
@@ -235,6 +235,9 @@ export default {
             this.pagination.current_page = page;
             this.created(page);
         },
+        tieneMaterias(items) {
+            return String(items?.mat_matr ?? '').trim().toLowerCase() === 'si';
+        },
         imprimirTabla() {
             window.print(table);
         },
@@ -381,27 +384,50 @@ th { border-top: 1px solid black; }
             main.hidden = false
             this.created()
         },
-        materia(items) {
+        async materia(items) {
             this.isLoading = true;
-            axios.post('/agregar/materia', {
-                semestre: items.semestre,
-                matricula: items.asignatura_id,
-            })
-                .then((res) => {
-                    this.notas = res.data.notas;
-                    this.created()
-                    this.isLoading = false
-                }).catch((error) => {
-                    this.nota = [];
-                    this.isLoading = false
-                })
+            try {
+                await axios.post('/agregar/materia', {
+                    semestre: items.semestre,
+                    matricula: items.asignatura_id,
+                });
+
+                // Actualiza el estado de la fila sin ocultar la pantalla de notas.
+                items.mat_matr = 'Si';
+                await this.getNotas(items);
+            } catch (error) {
+                console.error('No fue posible agregar las materias:', error);
+                if (window.toastr) {
+                    toastr.error(error.response?.data?.message || 'No fue posible agregar las materias del semestre.');
+                } else {
+                    window.alert(error.response?.data?.message || 'No fue posible agregar las materias del semestre.');
+                }
+            } finally {
+                this.isLoading = false;
+            }
         },
         async getNotas(items) {
-            this.salir = false
-            dos.hidden = false;
-            main.hidden = true;
-            const res = await axios.get(`/notas/${items.asignatura_id}`, this.form,)
-            this.notas = res.data
+            this.salir = false;
+            this.idEdit = null;
+            this.editando = false;
+            document.getElementById('dos').hidden = false;
+            document.getElementById('main').hidden = true;
+            try {
+                const res = await axios.get(`/notas/${items.asignatura_id}`);
+                this.notas = Array.isArray(res.data) ? res.data : [];
+                this.form = {
+                    semestre: items.semestre,
+                    materia: '',
+                    materias: '',
+                    corte1: null,
+                    corte2: null,
+                    corte3: null,
+                    habilitada_recuperacion: false
+                };
+            } catch (error) {
+                console.error('No fue posible consultar las notas:', error);
+                if (window.toastr) toastr.error('No fue posible cargar las notas del estudiante.');
+            }
         },
         guardarNota() {
             this.isLoading = true;
