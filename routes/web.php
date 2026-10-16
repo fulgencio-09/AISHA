@@ -59,8 +59,8 @@ Route::post('/reporte/busca', [App\Http\Controllers\Reporte::class, 'buscar'])->
 Route::post('/abono/pdf', [App\Http\Controllers\Reporte::class, 'reporte'])->name('abj/personas');
 Route::get('/cerrar/{id}', [App\Http\Controllers\Reporte::class, 'cerrar'])->name('as/personas');
 Route::get('/abrir/{id}', [App\Http\Controllers\Reporte::class, 'abrir'])->name('as/personas');
-Route::post('/exportar', [App\Http\Controllers\Reporte::class, 'listadomatriculado'])->name('exportar.listado');
-Route::post('/exportar_', [App\Http\Controllers\Reporte::class, 'listado'])->name('exportar.listado');
+Route::post('/exportar', [App\Http\Controllers\Reporte::class, 'exportarPagosExcel'])->name('exportar.pagos.xlsx');
+Route::post('/exportar_', [App\Http\Controllers\Reporte::class, 'exportarMatriculasExcel'])->name('exportar.matriculas.xlsx');
 Route::get('/relacion', [App\Http\Controllers\Reporte::class, 'show'])->name('exportar.listado');
 
 Route::post('/enviar', [App\Http\Controllers\CorreoController::class, 'enviar']);
