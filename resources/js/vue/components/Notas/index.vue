@@ -44,7 +44,7 @@
                             <tr v-for="items in nota" :key="items.id">
                                 <td class="fw-semibold">{{ items.documento }}</td>
                                 <td class="text-uppercase">{{ items.name }}</td>
-                                <td>{{ items.semestre }}</td>
+                                <td>{{ nombreSemestre(items.semestre) }}</td>
                                 <td class="actions-cell">
                                     <button @click="consulta(items)" class="btn btn-secondary btn-sm action-btn" title="Certificado de notas"><i class="fa fa-print"></i></button>
                                     <button v-if="!tieneMaterias(items)" @click="materia(items)" class="btn btn-info btn-sm action-btn" title="Agregar Materia"><i class="fa fa-file-text" aria-hidden="true"></i></button>
@@ -90,7 +90,7 @@
                         <thead><tr><th>SEMESTRE</th><th>MATERIA</th><th>CORTE 1</th><th>CORTE 2</th><th>CORTE 3</th><th>ACUMULADO</th><th>ACCIONES</th></tr></thead>
                         <tbody>
                             <tr v-for="nota in notas" :key="nota.id">
-                                <td>{{ nota.semestre }}</td><td class="text-uppercase">{{ nota.materia }}</td><td>{{ nota.corte1 ?? '-' }}</td><td>{{ nota.corte2 ?? '-' }}</td><td>{{ nota.corte3 ?? '-' }}</td><td>{{ calcularAcumulado(nota) }}</td>
+                                <td>{{ nombreSemestre(nota.semestre) }}</td><td class="text-uppercase">{{ nota.materia }}</td><td>{{ nota.corte1 ?? '-' }}</td><td>{{ nota.corte2 ?? '-' }}</td><td>{{ nota.corte3 ?? '-' }}</td><td>{{ calcularAcumulado(nota) }}</td>
                                 <td class="actions-cell"><button @click="editarNota(nota)" class="btn btn-warning btn-sm action-btn" title="Editar"><i class="fa fa-pencil" aria-hidden="true"></i></button></td>
                             </tr>
                             <tr v-if="!notas.length"><td colspan="7" class="empty-row"><i class="fa fa-folder-open-o fa-2x d-block mb-2"></i>Seleccione un estudiante para consultar sus notas.</td></tr>
@@ -163,8 +163,9 @@ export default {
             return String(valor ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\"/g, '&quot;').replace(/'/g, '&#039;');
         },
         nombreSemestre(semestre) {
-            const nombres = { 1: 'Primer', 2: 'Segundo', 3: 'Tercer', 4: 'Cuarto', 5: 'Quinto' };
-            return nombres[Number(semestre)] || `${semestre}°`;
+            const nombres = { 1: 'Introductorio', 2: 'Primer semestre', 3: 'Segundo semestre', 4: 'Tercer semestre', 5: 'Cuarto semestre' };
+            const valor = String(semestre ?? '').trim();
+            return nombres[Number(valor)] || (Object.values(nombres).includes(valor) ? valor : '—');
         },
         imprimirCertificado(items, notas) {
             const logoUrl = `${window.location.origin}/images/aishap.png`;
@@ -196,7 +197,7 @@ export default {
 <div class="certificado">
 <div class="encabezado"><img src="${logoUrl}" class="logo" alt="AISHA"><div class="institucion">Fundación para el Desarrollo Educativo y Social de La Guajira</div><div class="nit"><strong>NIT:</strong> 901691754-7</div></div>
 <div class="titulo">Certificación de Notas</div>
-<div class="texto">La Fundación para el Desarrollo Educativo y Social de La Guajira certifica que el(la) estudiante <strong>${estudiante}</strong>, identificado(a) con documento No. <strong>${documento}</strong>, cursó las asignaturas correspondientes al <strong>${semestre} semestre</strong>${anio ? ` del año <strong>${anio}</strong>` : ''}, de acuerdo con los registros académicos disponibles en el sistema institucional.</div>
+<div class="texto">La Fundación para el Desarrollo Educativo y Social de La Guajira certifica que el(la) estudiante <strong>${estudiante}</strong>, identificado(a) con documento No. <strong>${documento}</strong>, cursó las asignaturas correspondientes al <strong>${semestre}</strong>${anio ? ` del año <strong>${anio}</strong>` : ''}, de acuerdo con los registros académicos disponibles en el sistema institucional.</div>
 <table class="datos"><tr><td class="label">Estudiante</td><td>${estudiante}</td></tr><tr><td class="label">Documento</td><td>${documento}</td></tr><tr><td class="label">Semestre</td><td>${semestre}</td></tr>${anio ? `<tr><td class="label">Año</td><td>${anio}</td></tr>` : ''}<tr><td class="label">Fecha de expedición</td><td>${fecha}</td></tr></table>
 <table class="notas"><thead><tr><th>Materia</th><th>Corte 1</th><th>Corte 2</th><th>Corte 3</th><th>Nota final</th></tr></thead><tbody>${filas || '<tr><td colspan="5">No hay calificaciones registradas para este semestre.</td></tr>'}</tbody></table>
 <div class="promedio">Promedio del semestre: ${promedio}</div>
