@@ -46,11 +46,12 @@ Route::post('/facturas', [App\Http\Controllers\Abonos::class, 'factura'])->name(
 Route::get('/abono/credito/{id}', [App\Http\Controllers\Abonos::class, 'credito'])->name('abj/personas');
 Route::get('/abono/eliminar/{id}/{user_id}', [App\Http\Controllers\Abonos::class, 'eliminar'])->name('abj/personas');
 
-// Informe de deudas: solo administración.
+// Shell de Vue del informe de deudas: solo administración.
 Route::middleware('admin')->group(function(){
+    Route::get('/reporte/deudas', [App\Http\Controllers\HomeController::class, 'index'])->name('reporte.deudas.frontend');
     Route::get('/reporte/deudas/anos', [App\Http\Controllers\Reporte::class, 'anosDeudas'])->name('reporte.deudas.anos');
+    Route::get('/reporte/deudas/data', [App\Http\Controllers\Reporte::class, 'deudas'])->name('reporte.deudas.data');
     Route::get('/reporte/deudas/xlsx', [App\Http\Controllers\Reporte::class, 'deudasExcel'])->name('reporte.deudas.xlsx');
-    Route::get('/reporte/deudas', [App\Http\Controllers\Reporte::class, 'deudas'])->name('reporte.deudas');
 });
 
 Route::resource('/reporte', App\Http\Controllers\Reporte::class );
