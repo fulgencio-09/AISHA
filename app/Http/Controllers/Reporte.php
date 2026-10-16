@@ -12,6 +12,8 @@ use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use PhpOffice\PhpSpreadsheet\Style\Fill;
 use PhpOffice\PhpSpreadsheet\Style\Alignment;
+use PhpOffice\PhpSpreadsheet\Style\Border;
+use PhpOffice\PhpSpreadsheet\Worksheet\PageSetup;
 
 class Reporte extends Controller
 {
@@ -272,6 +274,55 @@ class Reporte extends Controller
         ];
     }
 
+    private function prepararHojaExcel($sheet, $ultimaColumna, $ultimaFila, $titulo, $subtitulo, $anchoMinimo = [])
+    {
+        $sheet->mergeCells("A1:{$ultimaColumna}1");
+        $sheet->mergeCells("A2:{$ultimaColumna}2");
+        $sheet->getStyle("A1:{$ultimaColumna}1")->getFont()->setBold(true)->setSize(16);
+        $sheet->getStyle("A1:{$ultimaColumna}1")->getFont()->getColor()->setARGB('FFFFFF');
+        $sheet->getStyle("A1:{$ultimaColumna}1")->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setARGB('536B84');
+        $sheet->getStyle("A1:{$ultimaColumna}1")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER)->setVertical(Alignment::VERTICAL_CENTER);
+        $sheet->getStyle("A2:{$ultimaColumna}2")->getFont()->setItalic(true)->setSize(10);
+        $sheet->getStyle("A2:{$ultimaColumna}2")->getFont()->getColor()->setARGB('62758A');
+        $sheet->getStyle("A2:{$ultimaColumna}2")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_LEFT)->setVertical(Alignment::VERTICAL_CENTER);
+        $sheet->getRowDimension(1)->setRowHeight(28);
+        $sheet->getRowDimension(2)->setRowHeight(20);
+
+        $headerRow = 4;
+        $sheet->getStyle("A{$headerRow}:{$ultimaColumna}{$headerRow}")->getFont()->setBold(true)->setSize(10);
+        $sheet->getStyle("A{$headerRow}:{$ultimaColumna}{$headerRow}")->getFont()->getColor()->setARGB('FFFFFF');
+        $sheet->getStyle("A{$headerRow}:{$ultimaColumna}{$headerRow}")->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setARGB('6C63FF');
+        $sheet->getStyle("A{$headerRow}:{$ultimaColumna}{$headerRow}")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER)->setVertical(Alignment::VERTICAL_CENTER)->setWrapText(true);
+        $sheet->getRowDimension($headerRow)->setRowHeight(30);
+
+        if ($ultimaFila >= 5) {
+            $sheet->getStyle("A5:{$ultimaColumna}{$ultimaFila}")->getAlignment()->setVertical(Alignment::VERTICAL_CENTER);
+            $sheet->getStyle("A5:{$ultimaColumna}{$ultimaFila}")->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_THIN)->getColor()->setARGB('D5DCE4');
+            for ($fila = 5; $fila <= $ultimaFila; $fila++) {
+                if ($fila % 2 === 0) {
+                    $sheet->getStyle("A{$fila}:{$ultimaColumna}{$fila}")->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setARGB('F7F9FC');
+                }
+            }
+        }
+
+        foreach ($anchoMinimo as $columna => $ancho) {
+            $sheet->getColumnDimension($columna)->setWidth($ancho);
+        }
+
+        $sheet->freezePane('A5');
+        $sheet->setAutoFilter("A4:{$ultimaColumna}" . max(4, $ultimaFila));
+        $sheet->getPageSetup()->setOrientation(PageSetup::ORIENTATION_LANDSCAPE);
+        $sheet->getPageSetup()->setPaperSize(PageSetup::PAPERSIZE_A4);
+        $sheet->getPageSetup()->setFitToWidth(1);
+        $sheet->getPageSetup()->setFitToHeight(0);
+        $sheet->getPageSetup()->setRowsToRepeatAtTopByStartAndEnd(1, 4);
+        $sheet->getPageMargins()->setTop(0.35)->setRight(0.25)->setBottom(0.35)->setLeft(0.25);
+        $sheet->getHeaderFooter()->setOddFooter('&LGenerado por AISHA&CFecha: &D&P/&N');
+
+        $sheet->setCellValue('A1', $titulo);
+        $sheet->setCellValue('A2', $subtitulo);
+    }
+
     public function deudasExcel(Request $request)
     {
         $items = $this->normalizarDeudas($this->consultaDeudas($request)->get());
@@ -281,9 +332,9 @@ class Reporte extends Controller
         $sheet->setTitle('Informe de Deudas');
 
         $headers = ['Documento', 'Estudiante', 'Año', 'Período', 'Semestre', 'Valor matrícula', 'Pagado', 'Deuda', 'Estado'];
-        $sheet->fromArray($headers, null, 'A1');
+        $sheet->fromArray($headers, null, 'A4');
 
-        $row = 2;
+        $row = 5;
         foreach ($items as $item) {
             $sheet->fromArray([
                 $item->documento,
@@ -299,23 +350,119 @@ class Reporte extends Controller
             $row++;
         }
 
-        $sheet->getStyle('A1:I1')->getFont()->setBold(true);
-        $sheet->getStyle('A1:I1')->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setARGB('D9EAF7');
-        $sheet->getStyle('A1:I1')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
-        $sheet->freezePane('A2');
-        $sheet->setAutoFilter('A1:I' . max(1, $row - 1));
+        $ultimaFila = max(4, $row - 1);
+        $this->prepararHojaExcel(
+            $sheet,
+            'I',
+            $ultimaFila,
+            'INFORME DE DEUDAS',
+            'Reporte académico y financiero generado por AISHA',
+            ['A' => 16, 'B' => 32, 'C' => 10, 'D' => 10, 'E' => 24, 'F' => 18, 'G' => 18, 'H' => 18, 'I' => 14]
+        );
 
         foreach (['F', 'G', 'H'] as $col) {
-            $sheet->getStyle($col . '2:' . $col . max(2, $row - 1))->getNumberFormat()->setFormatCode('#,##0');
+            $sheet->getStyle($col . '5:' . $col . $ultimaFila)->getNumberFormat()->setFormatCode('#,##0');
+            $sheet->getStyle($col . '5:' . $col . $ultimaFila)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_RIGHT);
         }
-
-        foreach (range('A', 'I') as $col) {
-            $sheet->getColumnDimension($col)->setAutoSize(true);
-        }
-
-        $sheet->getStyle('H2:H' . max(2, $row - 1))->getFont()->setBold(true);
+        $sheet->getStyle('A5:A' . $ultimaFila)->getNumberFormat()->setFormatCode('@');
+        $sheet->getStyle('C5:D' . $ultimaFila)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+        $sheet->getStyle('I5:I' . $ultimaFila)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+        $sheet->getStyle('H5:H' . $ultimaFila)->getFont()->setBold(true);
 
         $nombre = 'informe_deudas_' . ($request->input('ano') ?: 'todos') . '_' . ($request->input('periodo') ?: 'todos') . '_' . ($request->input('semestre') ?: 'todos') . '.xlsx';
+        $writer = new Xlsx($spreadsheet);
+
+        return response()->streamDownload(function () use ($writer) {
+            $writer->save('php://output');
+        }, $nombre, [
+            'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        ]);
+    }
+
+    public function exportarPagosExcel(Request $request)
+    {
+        $inicial = $request->input('finicial');
+        $final = $request->input('ffinal');
+
+        $reporte = Abono::join('asignaturas', 'abonos.asignatura_id', '=', 'asignaturas.id')
+            ->join('estudiantes', 'estudiantes.id', '=', 'asignaturas.estudiante_id')
+            ->join('users', 'users.id', '=', 'abonos.user_id')
+            ->where('abonos.fechas', '>=', $inicial)
+            ->where('abonos.fechas', '<=', $final)
+            ->select(
+                'estudiantes.documento as DOCUMENTO',
+                'estudiantes.name as ESTUDIANTE',
+                'estudiantes.telefono as TELEFONO',
+                'estudiantes.correo as CORREO ELECTRONICO',
+                'estudiantes.direccion as DIRECCION',
+                DB::raw("CASE asignaturas.semestre WHEN 1 THEN 'Introductorio' WHEN 2 THEN 'Primer semestre' WHEN 3 THEN 'Segundo semestre' WHEN 4 THEN 'Tercer semestre' WHEN 5 THEN 'Cuarto semestre' ELSE 'Sin semestre' END AS SEMESTRE"),
+                'asignaturas.total as VALOR MATRICULA',
+                'asignaturas.valor as PENDIENTE',
+                'abonos.cantidad as ABONO REALIZADO',
+                'abonos.formapago as FORMA DE PAGO',
+                'abonos.fechas as FECHA DE PAGO',
+                'users.name as CAJERO'
+            )
+            ->orderBy('abonos.id', 'asc')
+            ->get();
+
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+        $sheet->setTitle('Pagos realizados');
+
+        $headers = ['Documento', 'Estudiante', 'Teléfono', 'Correo electrónico', 'Dirección', 'Semestre', 'Valor matrícula', 'Pendiente', 'Abono realizado', 'Forma de pago', 'Fecha de pago', 'Cajero'];
+        $sheet->fromArray($headers, null, 'A4');
+
+        $row = 5;
+        foreach ($reporte as $item) {
+            $sheet->fromArray([
+                $item->DOCUMENTO,
+                $item->ESTUDIANTE,
+                $item->TELEFONO,
+                $item->{'CORREO ELECTRONICO'},
+                $item->DIRECCION,
+                $item->SEMESTRE,
+                (float) $item->{'VALOR MATRICULA'},
+                (float) $item->PENDIENTE,
+                (float) $item->{'ABONO REALIZADO'},
+                $item->{'FORMA DE PAGO'},
+                $item->{'FECHA DE PAGO'},
+                $item->CAJERO,
+            ], null, 'A' . $row);
+            $row++;
+        }
+
+        $ultimaFila = max(4, $row - 1);
+        $this->prepararHojaExcel(
+            $sheet,
+            'L',
+            $ultimaFila,
+            'LISTADO DE PAGOS REALIZADOS',
+            'Pagos registrados entre ' . ($inicial ?: 'sin fecha inicial') . ' y ' . ($final ?: 'sin fecha final'),
+            ['A' => 16, 'B' => 30, 'C' => 16, 'D' => 28, 'E' => 30, 'F' => 22, 'G' => 18, 'H' => 18, 'I' => 18, 'J' => 20, 'K' => 16, 'L' => 28]
+        );
+
+        foreach (['G', 'H', 'I'] as $col) {
+            $sheet->getStyle($col . '5:' . $col . $ultimaFila)->getNumberFormat()->setFormatCode('#,##0');
+            $sheet->getStyle($col . '5:' . $col . $ultimaFila)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_RIGHT);
+        }
+        $sheet->getStyle('A5:A' . $ultimaFila)->getNumberFormat()->setFormatCode('@');
+        $sheet->getStyle('C5:C' . $ultimaFila)->getNumberFormat()->setFormatCode('@');
+        $sheet->getStyle('K5:K' . $ultimaFila)->getNumberFormat()->setFormatCode('yyyy-mm-dd');
+        $sheet->getStyle('F5:F' . $ultimaFila)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+        $sheet->getStyle('J5:K' . $ultimaFila)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+
+        $filaTotal = $ultimaFila + 2;
+        if ($ultimaFila >= 5) {
+            $sheet->setCellValue('H' . $filaTotal, 'TOTAL ABONOS');
+            $sheet->setCellValue('I' . $filaTotal, '=SUM(I5:I' . $ultimaFila . ')');
+            $sheet->getStyle('H' . $filaTotal . ':I' . $filaTotal)->getFont()->setBold(true);
+            $sheet->getStyle('H' . $filaTotal . ':I' . $filaTotal)->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setARGB('E8F5E9');
+            $sheet->getStyle('I' . $filaTotal)->getNumberFormat()->setFormatCode('#,##0');
+            $sheet->getStyle('H' . $filaTotal . ':I' . $filaTotal)->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_THIN)->getColor()->setARGB('C8D6E5');
+        }
+
+        $nombre = 'pagos_realizados_' . ($inicial ?: 'inicio') . '_' . ($final ?: 'fin') . '.xlsx';
         $writer = new Xlsx($spreadsheet);
 
         return response()->streamDownload(function () use ($writer) {
