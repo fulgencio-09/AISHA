@@ -78,8 +78,6 @@
 import axios from 'axios';
 import Loading from 'vue-loading-overlay';
 import 'vue-loading-overlay/dist/vue-loading.css';
-import { utils, writeFileXLSX } from 'xlsx';
-import exportFromJSON from 'export-from-json';
 
 export default {
     name: 'ReportesRelacion',
@@ -91,46 +89,47 @@ export default {
             ffinal: '',
             finicial1: '',
             ffinal1: '',
-            reporte: [],
         };
     },
     methods: {
-        agregar() {
+        async descargar(url, datos, nombre, mensaje) {
             this.isLoading = true;
-            axios.post('/exportar', {
-                finicial: this.finicial,
-                ffinal: this.ffinal,
-            }).then((res) => {
-                this.reporte = res.data.reporte || [];
-                const wb = utils.book_new();
-                const ws = utils.json_to_sheet(this.reporte);
-                utils.book_append_sheet(wb, ws, 'BASE DE DATOS');
-                writeFileXLSX(wb, 'Listado de cuotas por estudiantes.xlsx');
-                toastr.success('Reporte de pagos exportado correctamente.');
-            }).catch((error) => {
-                toastr.error(error?.response?.data?.message || 'No fue posible exportar el reporte de pagos.');
-            }).finally(() => {
+            try {
+                const response = await axios.post(url, datos, { responseType: 'blob' });
+                const blob = new Blob([response.data], {
+                    type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+                });
+                const urlDescarga = window.URL.createObjectURL(blob);
+                const enlace = document.createElement('a');
+                enlace.href = urlDescarga;
+                enlace.download = nombre;
+                document.body.appendChild(enlace);
+                enlace.click();
+                enlace.remove();
+                window.URL.revokeObjectURL(urlDescarga);
+                toastr.success(mensaje);
+            } catch (error) {
+                console.error(error);
+                toastr.error('No fue posible generar el archivo Excel.');
+            } finally {
                 this.isLoading = false;
-            });
+            }
+        },
+        agregar() {
+            this.descargar(
+                '/exportar',
+                { finicial: this.finicial, ffinal: this.ffinal },
+                `Listado_pagos_${this.finicial || 'inicio'}_${this.ffinal || 'fin'}.xlsx`,
+                'Reporte de pagos exportado correctamente.'
+            );
         },
         exportar() {
-            this.isLoading = true;
-            axios.post('/exportar_', {
-                finicial: this.finicial1,
-                ffinal: this.ffinal1,
-            }).then((res) => {
-                this.reporte = res.data.reporte || [];
-                exportFromJSON({
-                    data: this.reporte,
-                    fileName: 'Listado de estudiantes matriculados',
-                    exportType: exportFromJSON.types.xls,
-                });
-                toastr.success('Reporte de estudiantes exportado correctamente.');
-            }).catch((error) => {
-                toastr.error(error?.response?.data?.message || 'No fue posible exportar el reporte de estudiantes.');
-            }).finally(() => {
-                this.isLoading = false;
-            });
+            this.descargar(
+                '/exportar_',
+                { finicial: this.finicial1, ffinal: this.ffinal1 },
+                `Listado_matriculados_${this.finicial1 || 'inicio'}_${this.ffinal1 || 'fin'}.xlsx`,
+                'Reporte de estudiantes exportado correctamente.'
+            );
         },
         limpiar() {
             this.finicial = '';
