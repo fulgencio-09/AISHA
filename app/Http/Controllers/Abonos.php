@@ -289,10 +289,35 @@ class Abonos extends Controller
         $asignatura->valor = (float) $asignatura->valor - $cantidad;
         $asignatura->save();
 
-        return response()->json([
-            'message' => 'Abono registrado correctamente.',
-            'data' => $input,
-        ]);
+        $abonos = Abono::join('asignaturas', 'asignaturas.id', '=', 'abonos.asignatura_id')
+            ->join('estudiantes', 'estudiantes.id', '=', 'asignaturas.estudiante_id')
+            ->leftJoin('users', 'users.id', '=', 'abonos.user_id')
+            ->where('abonos.asignatura_id', '=', $asignatura->id)
+            ->where(function ($query) {
+                $query->where('abonos.estado', '=', 1)
+                    ->orWhereNull('abonos.estado');
+            })
+            ->select(
+                'estudiantes.name',
+                'estudiantes.documento',
+                'abonos.formapago',
+                'users.name as nombre',
+                'abonos.deuda',
+                'abonos.id',
+                'abonos.asignatura_id',
+                'asignaturas.semestre',
+                'asignaturas.periodo',
+                'estudiantes.telefono',
+                'asignaturas.año',
+                'abonos.cantidad',
+                'asignaturas.valor',
+                'abonos.fechas',
+                'abonos.estado'
+            )
+            ->orderBy('abonos.id', 'asc')
+            ->get();
+
+        return response()->json($abonos);
     }
 
     public function show(Request $request)
