@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Auth;
 use App\Services\WhatsAppService;
 use Barryvdh\DomPDF\Facade\Pdf;
 use App\Models\Abono;
@@ -98,7 +99,10 @@ class Abonos extends Controller
             ->join('estudiantes', 'estudiantes.id', '=', 'asignaturas.estudiante_id')
             ->leftJoin('users', 'users.id', '=', 'abonos.user_id')
             ->where('abonos.asignatura_id', '=', $asignatura_id)
-            ->where('abonos.estado', '=', 1)
+            ->where(function ($query) {
+                $query->where('abonos.estado', '=', 1)
+                    ->orWhereNull('abonos.estado');
+            })
             ->select(
                 'estudiantes.name',
                 'estudiantes.documento',
@@ -113,8 +117,10 @@ class Abonos extends Controller
                 'asignaturas.año',
                 'abonos.cantidad',
                 'asignaturas.valor',
-                'abonos.fechas'
+                'abonos.fechas',
+                'abonos.estado'
             )
+            ->orderBy('abonos.id', 'asc')
             ->get();
 
         return ['abono' => $abono];
@@ -122,8 +128,6 @@ class Abonos extends Controller
 
     public function credito(Request $request, $id)
     {
-        // Este endpoint solo carga la matrícula seleccionada.
-        // La regla de negocio para permitir el abono se valida en store().
         $cred = Asignatura::join('estudiantes', 'estudiantes.id', '=', 'asignaturas.estudiante_id')
             ->where('asignaturas.id', '=', $id)
             ->where('asignaturas.valor', '>', 0)
@@ -244,8 +248,6 @@ class Abonos extends Controller
             ], 422);
         }
 
-        // La matrícula seleccionada es la fuente de verdad. No se exige estado aquí;
-        // la regla obligatoria para permitir el abono es que el seguro esté pagado.
         $asignatura = Asignatura::where('id', $asignatura_id)
             ->where('valor', '>', 0)
             ->first();
@@ -279,6 +281,8 @@ class Abonos extends Controller
         $input['asignatura_id'] = $asignatura->id;
         $input['semestre'] = $asignatura->semestre;
         $input['deuda'] = (float) $asignatura->valor - $cantidad;
+        $input['estado'] = 1;
+        $input['user_id'] = Auth::id();
 
         Abono::create($input);
 
