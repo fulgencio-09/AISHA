@@ -21,8 +21,8 @@
                 <div class="row g-3 align-items-end">
                     <div class="col-md-4"><label class="form-label">Buscar estudiante</label><input v-model="filtros.buscar" type="text" class="form-control" placeholder="Documento o nombre"></div>
                     <div class="col-md-2"><label class="form-label">Año</label><input v-model="filtros.ano" type="number" class="form-control" placeholder="2026"></div>
-                    <div class="col-md-2"><label class="form-label">Período</label><input v-model="filtros.periodo" type="text" class="form-control" placeholder="INTRODUCTORIO"></div>
-                    <div class="col-md-2"><label class="form-label">Semestre</label><select v-model="filtros.semestre" class="form-select"><option value="">Todos</option><option v-for="semestre in [1,2,3,4,5]" :key="semestre" :value="semestre">{{ semestre }}</option></select></div>
+                    <div class="col-md-2"><label class="form-label">Período</label><select v-model="filtros.periodo" class="form-select"><option value="">Todos</option><option value="1">1</option><option value="2">2</option></select></div>
+                    <div class="col-md-2"><label class="form-label">Semestre</label><select v-model="filtros.semestre" class="form-select"><option value="">Todos</option><option v-for="semestre in [1,2,3,4,5]" :key="semestre" :value="semestre">{{ nombreSemestre(semestre) }}</option></select></div>
                     <div class="col-md-2"><label class="form-label">Estado</label><select v-model="filtros.estado" class="form-select"><option value="">Todos</option><option value="0">Pendiente</option><option value="1">Pagado</option></select></div>
                 </div>
                 <div class="mt-3 d-flex gap-2"><button class="btn btn-primary" @click="buscar"><i class="fa fa-search me-1"></i> Buscar</button><button class="btn btn-outline-secondary" @click="limpiarFiltros"><i class="fa fa-eraser me-1"></i> Limpiar</button></div>
@@ -42,7 +42,10 @@
                         <tr v-for="seguro in seguros" :key="seguro.asignatura_id">
                             <td>{{ estudiante(seguro).documento || '—' }}</td>
                             <td><div class="fw-semibold">{{ estudiante(seguro).name || 'Sin nombre' }}</div><small class="text-muted">Matrícula #{{ seguro.asignatura_id }}</small></td>
-                            <td>{{ asignatura(seguro).sede || '—' }}</td><td>{{ asignatura(seguro).año || '—' }}</td><td>{{ asignatura(seguro).periodo || '—' }}</td><td>{{ asignatura(seguro).semestre || '—' }}</td>
+                            <td>{{ asignatura(seguro).sede || '—' }}</td>
+                            <td>{{ asignatura(seguro).año || '—' }}</td>
+                            <td>{{ asignatura(seguro).periodo || '—' }}</td>
+                            <td>{{ nombreSemestre(asignatura(seguro).semestre) }}</td>
                             <td class="fw-semibold">{{ seguro.seguro_registrado ? moneda(seguro.valor) : 'Sin registrar' }}</td>
                             <td><span v-if="seguro.seguro_registrado && Boolean(seguro.estado)" class="badge bg-success-subtle text-success">Pagado</span><span v-else-if="seguro.seguro_registrado" class="badge bg-warning-subtle text-warning">Pendiente</span><span v-else class="badge bg-secondary-subtle text-secondary">Sin registrar</span></td>
                             <td class="text-center">
@@ -58,20 +61,12 @@
 
             <div class="card-footer bg-white">
                 <div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
-                    <div class="text-muted small">
-                        Página {{ meta.current_page }} de {{ meta.last_page }} · Mostrando {{ desdeRegistro }}-{{ hastaRegistro }} de {{ meta.total }}
-                    </div>
+                    <div class="text-muted small">Página {{ meta.current_page }} de {{ meta.last_page }} · Mostrando {{ desdeRegistro }}-{{ hastaRegistro }} de {{ meta.total }}</div>
                     <nav aria-label="Paginación de seguros">
                         <ul class="pagination pagination-sm mb-0">
-                            <li class="page-item" :class="{ disabled: meta.current_page === 1 }">
-                                <button class="page-link" :disabled="meta.current_page === 1" @click="cambiarPagina(meta.current_page - 1)">Anterior</button>
-                            </li>
-                            <li v-for="pagina in paginasVisibles" :key="pagina" class="page-item" :class="{ active: pagina === meta.current_page }">
-                                <button class="page-link" @click="cambiarPagina(pagina)">{{ pagina }}</button>
-                            </li>
-                            <li class="page-item" :class="{ disabled: meta.current_page === meta.last_page }">
-                                <button class="page-link" :disabled="meta.current_page === meta.last_page" @click="cambiarPagina(meta.current_page + 1)">Siguiente</button>
-                            </li>
+                            <li class="page-item" :class="{ disabled: meta.current_page === 1 }"><button class="page-link" :disabled="meta.current_page === 1" @click="cambiarPagina(meta.current_page - 1)">Anterior</button></li>
+                            <li v-for="pagina in paginasVisibles" :key="pagina" class="page-item" :class="{ active: pagina === meta.current_page }"><button class="page-link" @click="cambiarPagina(pagina)">{{ pagina }}</button></li>
+                            <li class="page-item" :class="{ disabled: meta.current_page === meta.last_page }"><button class="page-link" :disabled="meta.current_page === meta.last_page" @click="cambiarPagina(meta.current_page + 1)">Siguiente</button></li>
                         </ul>
                     </nav>
                 </div>
@@ -140,6 +135,10 @@ export default {
     mounted() { this.cargarSeguros(); },
     methods: {
         fechaHoy() { const f = new Date(); return `${f.getFullYear()}-${String(f.getMonth()+1).padStart(2,'0')}-${String(f.getDate()).padStart(2,'0')}`; },
+        nombreSemestre(semestre) {
+            const nombres = { 1: 'Introductorio', 2: 'Primer semestre', 3: 'Segundo semestre', 4: 'Tercer semestre', 5: 'Cuarto semestre' };
+            return nombres[Number(semestre)] || '—';
+        },
         cargarSeguros(pagina = 1) {
             this.cargando = true;
             const params = { page: pagina, per_page: 10 };
@@ -147,14 +146,7 @@ export default {
             axios.get('/seguro', { params }).then(response => {
                 const data = response.data || {};
                 this.seguros = data.data || [];
-                this.meta = {
-                    current_page: data.current_page || 1,
-                    last_page: data.last_page || 1,
-                    total: data.total || 0,
-                    per_page: data.per_page || 10,
-                    from: data.from || 0,
-                    to: data.to || 0,
-                };
+                this.meta = { current_page: data.current_page || 1, last_page: data.last_page || 1, total: data.total || 0, per_page: data.per_page || 10, from: data.from || 0, to: data.to || 0 };
             }).catch(error => { this.seguros = []; this.mostrarError(error, 'No fue posible consultar las matrículas.'); }).finally(() => { this.cargando = false; });
         },
         buscar() { this.cargarSeguros(1); },
@@ -177,9 +169,7 @@ export default {
             if (!window.confirm('¿Confirma que desea registrar el pago único de este seguro?')) return;
             this.guardando = true;
             axios.post(`/seguro/${this.seguroSeleccionado.id}/pagar`, this.form).then(response => {
-                this.mostrarExito(response.data?.message || 'Pago registrado correctamente.');
-                this.cerrarModal();
-                this.cargarSeguros(this.meta.current_page);
+                this.mostrarExito(response.data?.message || 'Pago registrado correctamente.'); this.cerrarModal(); this.cargarSeguros(this.meta.current_page);
             }).catch(error => { this.mostrarError(error, error.response?.data?.message || 'No fue posible registrar el pago.'); }).finally(() => { this.guardando = false; });
         },
         verPago(seguro) {
