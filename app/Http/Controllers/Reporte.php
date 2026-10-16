@@ -318,9 +318,9 @@ class Reporte extends Controller
         $sheet->getPageSetup()->setRowsToRepeatAtTopByStartAndEnd(1, 4);
         $sheet->getPageMargins()->setTop(0.35)->setRight(0.25)->setBottom(0.35)->setLeft(0.25);
         $sheet->getHeaderFooter()->setOddFooter('&LGenerado por AISHA&CFecha: &D&P/&N');
-
         $sheet->setCellValue('A1', $titulo);
         $sheet->setCellValue('A2', $subtitulo);
+        $sheet->setShowGridlines(false);
     }
 
     public function deudasExcel(Request $request)
@@ -351,14 +351,7 @@ class Reporte extends Controller
         }
 
         $ultimaFila = max(4, $row - 1);
-        $this->prepararHojaExcel(
-            $sheet,
-            'I',
-            $ultimaFila,
-            'INFORME DE DEUDAS',
-            'Reporte académico y financiero generado por AISHA',
-            ['A' => 16, 'B' => 32, 'C' => 10, 'D' => 10, 'E' => 24, 'F' => 18, 'G' => 18, 'H' => 18, 'I' => 14]
-        );
+        $this->prepararHojaExcel($sheet, 'I', $ultimaFila, 'INFORME DE DEUDAS', 'Reporte académico y financiero generado por AISHA', ['A' => 16, 'B' => 32, 'C' => 10, 'D' => 10, 'E' => 24, 'F' => 18, 'G' => 18, 'H' => 18, 'I' => 14]);
 
         foreach (['F', 'G', 'H'] as $col) {
             $sheet->getStyle($col . '5:' . $col . $ultimaFila)->getNumberFormat()->setFormatCode('#,##0');
@@ -374,9 +367,7 @@ class Reporte extends Controller
 
         return response()->streamDownload(function () use ($writer) {
             $writer->save('php://output');
-        }, $nombre, [
-            'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-        ]);
+        }, $nombre, ['Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet']);
     }
 
     public function exportarPagosExcel(Request $request)
@@ -409,7 +400,6 @@ class Reporte extends Controller
         $spreadsheet = new Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
         $sheet->setTitle('Pagos realizados');
-
         $headers = ['Documento', 'Estudiante', 'Teléfono', 'Correo electrónico', 'Dirección', 'Semestre', 'Valor matrícula', 'Pendiente', 'Abono realizado', 'Forma de pago', 'Fecha de pago', 'Cajero'];
         $sheet->fromArray($headers, null, 'A4');
 
@@ -433,14 +423,7 @@ class Reporte extends Controller
         }
 
         $ultimaFila = max(4, $row - 1);
-        $this->prepararHojaExcel(
-            $sheet,
-            'L',
-            $ultimaFila,
-            'LISTADO DE PAGOS REALIZADOS',
-            'Pagos registrados entre ' . ($inicial ?: 'sin fecha inicial') . ' y ' . ($final ?: 'sin fecha final'),
-            ['A' => 16, 'B' => 30, 'C' => 16, 'D' => 28, 'E' => 30, 'F' => 22, 'G' => 18, 'H' => 18, 'I' => 18, 'J' => 20, 'K' => 16, 'L' => 28]
-        );
+        $this->prepararHojaExcel($sheet, 'L', $ultimaFila, 'LISTADO DE PAGOS REALIZADOS', 'Pagos registrados entre ' . ($inicial ?: 'sin fecha inicial') . ' y ' . ($final ?: 'sin fecha final'), ['A' => 16, 'B' => 30, 'C' => 16, 'D' => 28, 'E' => 30, 'F' => 22, 'G' => 18, 'H' => 18, 'I' => 18, 'J' => 20, 'K' => 16, 'L' => 28]);
 
         foreach (['G', 'H', 'I'] as $col) {
             $sheet->getStyle($col . '5:' . $col . $ultimaFila)->getNumberFormat()->setFormatCode('#,##0');
@@ -467,8 +450,60 @@ class Reporte extends Controller
 
         return response()->streamDownload(function () use ($writer) {
             $writer->save('php://output');
-        }, $nombre, [
-            'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-        ]);
+        }, $nombre, ['Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet']);
+    }
+
+    public function exportarMatriculasExcel(Request $request)
+    {
+        $data = $this->listado($request);
+        $reporte = $data['reporte'];
+        $inicial = $request->input('finicial');
+        $final = $request->input('ffinal');
+
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+        $sheet->setTitle('Matrículas');
+        $headers = ['Documento', 'Estudiante', 'Teléfono', 'Correo electrónico', 'Dirección', 'Semestre', 'Valor matrícula'];
+        $sheet->fromArray($headers, null, 'A4');
+
+        $row = 5;
+        foreach ($reporte as $item) {
+            $sheet->fromArray([
+                $item->DOCUMENTO,
+                $item->ESTUDIANTE,
+                $item->TELEFONO,
+                $item->{'CORREO ELECTRONICO'},
+                $item->DIRECCION,
+                $item->SEMESTRE,
+                (float) $item->{'VALOR MATRICULA'},
+            ], null, 'A' . $row);
+            $row++;
+        }
+
+        $ultimaFila = max(4, $row - 1);
+        $this->prepararHojaExcel($sheet, 'G', $ultimaFila, 'LISTADO DE ESTUDIANTES MATRICULADOS', 'Matrículas registradas entre ' . ($inicial ?: 'sin fecha inicial') . ' y ' . ($final ?: 'sin fecha final'), ['A' => 16, 'B' => 32, 'C' => 16, 'D' => 28, 'E' => 32, 'F' => 22, 'G' => 20]);
+
+        $sheet->getStyle('A5:A' . $ultimaFila)->getNumberFormat()->setFormatCode('@');
+        $sheet->getStyle('C5:C' . $ultimaFila)->getNumberFormat()->setFormatCode('@');
+        $sheet->getStyle('G5:G' . $ultimaFila)->getNumberFormat()->setFormatCode('#,##0');
+        $sheet->getStyle('G5:G' . $ultimaFila)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_RIGHT);
+        $sheet->getStyle('F5:F' . $ultimaFila)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+
+        $filaTotal = $ultimaFila + 2;
+        if ($ultimaFila >= 5) {
+            $sheet->setCellValue('F' . $filaTotal, 'TOTAL MATRÍCULAS');
+            $sheet->setCellValue('G' . $filaTotal, '=SUM(G5:G' . $ultimaFila . ')');
+            $sheet->getStyle('F' . $filaTotal . ':G' . $filaTotal)->getFont()->setBold(true);
+            $sheet->getStyle('F' . $filaTotal . ':G' . $filaTotal)->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setARGB('E8F5E9');
+            $sheet->getStyle('G' . $filaTotal)->getNumberFormat()->setFormatCode('#,##0');
+            $sheet->getStyle('F' . $filaTotal . ':G' . $filaTotal)->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_THIN)->getColor()->setARGB('C8D6E5');
+        }
+
+        $nombre = 'matriculados_' . ($inicial ?: 'inicio') . '_' . ($final ?: 'fin') . '.xlsx';
+        $writer = new Xlsx($spreadsheet);
+
+        return response()->streamDownload(function () use ($writer) {
+            $writer->save('php://output');
+        }, $nombre, ['Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet']);
     }
 }
