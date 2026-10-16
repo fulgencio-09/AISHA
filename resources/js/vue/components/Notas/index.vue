@@ -2,21 +2,47 @@
     <main class="main notas-page" id="main">
         <div class="container-fluid py-3">
             <section class="notas-card" id="listado" v-show="vista === 'listado'">
-                <div class="section-title">Matriculados</div>
+                <div class="section-heading">
+                    <div>
+                        <h4 class="section-main-title mb-1"><i class="fa fa-graduation-cap me-2"></i>Matriculados</h4>
+                        <p class="section-subtitle mb-0">Consulta los estudiantes matriculados y gestiona sus notas.</p>
+                    </div>
+                    <span class="section-badge"><i class="fa fa-users me-1"></i>{{ pagination.total || 0 }} registros</span>
+                </div>
+
+                <div class="filter-card">
+                    <div class="row g-3 align-items-end">
+                        <div class="col-12 col-md-8">
+                            <label class="field-label">Buscar estudiante por documento</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-white"><i class="fa fa-search text-muted"></i></span>
+                                <input type="search" id="searchbox" class="form-control" v-model="identidad" @keyup.enter="buscar" placeholder="Digite el número de documento">
+                            </div>
+                        </div>
+                        <div class="col-12 col-md-4 d-flex gap-2">
+                            <button type="button" class="btn btn-primary flex-fill" @click="buscar" :disabled="isLoading">
+                                <i class="fa fa-search me-1"></i> Buscar
+                            </button>
+                            <button type="button" class="btn btn-outline-secondary flex-fill" @click="limpiarBusqueda">
+                                <i class="fa fa-refresh me-1"></i> Todos
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="table-responsive">
                     <table class="table notas-table mb-0">
                         <thead>
                             <tr>
-                                <th>DOCUMENTO</th><th>NOMBRE</th><th>SEMESTRE</th><th>ACCIONES</th>
-                            </tr>
-                            <tr class="filter-row">
-                                <th><input type="search" id="searchbox" class="form-control form-control-sm" v-model="identidad" @input="buscar" placeholder="Documento"></th>
-                                <th></th><th></th><th></th>
+                                <th>DOCUMENTO</th>
+                                <th>NOMBRE</th>
+                                <th>SEMESTRE</th>
+                                <th class="text-center">ACCIONES</th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr v-for="items in nota" :key="items.id">
-                                <td>{{ items.documento }}</td>
+                                <td class="fw-semibold">{{ items.documento }}</td>
                                 <td class="text-uppercase">{{ items.name }}</td>
                                 <td>{{ items.semestre }}</td>
                                 <td class="actions-cell">
@@ -25,7 +51,7 @@
                                     <button @click="getNotas(items)" class="btn btn-success btn-sm action-btn" title="Agregar Notas"><i class="fa fa-clipboard" aria-hidden="true"></i></button>
                                 </td>
                             </tr>
-                            <tr v-if="!nota.length"><td colspan="4" class="empty-row">No se encontraron estudiantes matriculados.</td></tr>
+                            <tr v-if="!nota.length"><td colspan="4" class="empty-row"><i class="fa fa-folder-open-o fa-2x d-block mb-2"></i>No se encontraron estudiantes matriculados.</td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -42,7 +68,12 @@
             </section>
 
             <section class="notas-card gestion-card" id="dos" v-show="vista === 'gestion'">
-                <div class="section-title">Gestión de Notas</div>
+                <div class="section-heading">
+                    <div>
+                        <h4 class="section-main-title mb-1"><i class="fa fa-clipboard me-2"></i>Gestión de Notas</h4>
+                        <p class="section-subtitle mb-0">Actualiza las calificaciones del estudiante seleccionado.</p>
+                    </div>
+                </div>
                 <form @submit.prevent="guardarNota">
                     <div class="form-panel">
                         <div class="row g-3">
@@ -62,7 +93,7 @@
                                 <td>{{ nota.semestre }}</td><td class="text-uppercase">{{ nota.materia }}</td><td>{{ nota.corte1 ?? '-' }}</td><td>{{ nota.corte2 ?? '-' }}</td><td>{{ nota.corte3 ?? '-' }}</td><td>{{ calcularAcumulado(nota) }}</td>
                                 <td class="actions-cell"><button @click="editarNota(nota)" class="btn btn-warning btn-sm action-btn" title="Editar"><i class="fa fa-pencil" aria-hidden="true"></i></button></td>
                             </tr>
-                            <tr v-if="!notas.length"><td colspan="7" class="empty-row">Seleccione un estudiante para consultar sus notas.</td></tr>
+                            <tr v-if="!notas.length"><td colspan="7" class="empty-row"><i class="fa fa-folder-open-o fa-2x d-block mb-2"></i>Seleccione un estudiante para consultar sus notas.</td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -186,6 +217,10 @@ window.onload = function () { setTimeout(function () { window.focus(); window.pr
             this.isLoading = true;
             axios.post('/notas/buscar', { identidad: this.identidad }).then((res) => { this.nota = res.data.nota.data; this.pagination = res.data.pagination; }).catch((error) => { console.error(error); this.nota = []; }).finally(() => { this.isLoading = false; });
         },
+        limpiarBusqueda() {
+            this.identidad = '';
+            this.created(1);
+        },
         async created(page = 1) {
             this.vista = 'listado'; this.isLoading = true;
             try { const res = await axios.get('/nota?page=' + page); this.nota = res.data.nota.data; this.pagination = res.data.pagination; }
@@ -228,16 +263,34 @@ window.onload = function () { setTimeout(function () { window.focus(); window.pr
 
 <style scoped>
 .notas-page { min-height: 100vh; }
-.notas-card { background: #fff; border: 1px solid #e4e9ef; border-radius: 10px; box-shadow: 0 4px 14px rgba(31, 45, 61, .08); padding: 16px; margin-bottom: 18px; }
-.section-title { border: 1px solid #d5dce4; color: #536b84; text-align: center; text-transform: none; font-size: 15px; padding: 5px 10px; margin-bottom: 16px; background: #fff; }
-.notas-table { border: 1px solid #d5dce4; font-size: 13px; }
-.notas-table th { color: #536b84; font-size: 12px; letter-spacing: .7px; text-align: center; vertical-align: middle; border-color: #d5dce4; padding: 10px 8px; }
-.notas-table td { text-align: center; vertical-align: middle; border-color: #d5dce4; padding: 9px 8px; }
-.filter-row th { padding: 8px; } .filter-row input { max-width: 180px; } .actions-cell { white-space: nowrap; }
-.action-btn { min-width: 36px; height: 32px; margin: 0 2px; border-radius: 6px; box-shadow: 0 3px 7px rgba(31,45,61,.16); }
-.table-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 14px; gap: 12px; } .total-label { color: #62758a; font-size: 13px; }
-.pagination .page-link { color: #61758c; border-color: #e2e7ec; } .pagination .page-item.active .page-link { color: #fff; background: #6c63ff; border-color: #6c63ff; }
-.form-panel { border: 1px solid #d5dce4; padding: 14px; background: #fff; } .field-label { display: block; color: #536b84; font-size: 12px; margin-bottom: 6px; }
-.form-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 16px; } .empty-row { color: #7d8b99; padding: 25px !important; }
-@media (max-width: 768px) { .table-footer { flex-direction: column; align-items: flex-start; } .notas-table { min-width: 760px; } }
+.notas-card { background: #fff; border: 1px solid #e4e9ef; border-radius: 12px; box-shadow: 0 5px 18px rgba(31, 45, 61, .08); padding: 20px; margin-bottom: 18px; }
+.section-heading { display: flex; justify-content: space-between; align-items: center; gap: 15px; margin-bottom: 18px; padding: 2px 2px 12px; border-bottom: 1px solid #edf1f5; }
+.section-main-title { color: #334e68; font-size: 18px; font-weight: 600; }
+.section-subtitle { color: #8291a3; font-size: 12px; }
+.section-badge { background: #f0f2ff; color: #625bdb; border-radius: 20px; padding: 7px 12px; font-size: 12px; font-weight: 600; white-space: nowrap; }
+.filter-card { background: #f8fafc; border: 1px solid #e3e9ef; border-radius: 10px; padding: 16px; margin-bottom: 18px; }
+.field-label { display: block; color: #52667a; font-size: 12px; font-weight: 600; margin-bottom: 6px; }
+.input-group-text { border-color: #dce3ea; }
+.form-control { border-color: #dce3ea; border-radius: 8px; min-height: 40px; }
+.btn { border-radius: 8px; font-weight: 600; }
+.notas-table { border: 1px solid #dce3ea; font-size: 13px; }
+.notas-table thead th { color: #52667a; background: #f8fafc; font-size: 11px; letter-spacing: .7px; text-align: center; vertical-align: middle; border-color: #dce3ea; padding: 12px 9px; }
+.notas-table tbody td { text-align: center; vertical-align: middle; border-color: #e2e8ee; padding: 11px 9px; color: #334e68; }
+.notas-table tbody tr:hover { background: #fafcff; }
+.actions-cell { white-space: nowrap; }
+.action-btn { min-width: 36px; height: 34px; margin: 0 2px; border-radius: 7px; border: 0; box-shadow: 0 3px 8px rgba(31,45,61,.14); }
+.table-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 16px; gap: 12px; }
+.total-label { color: #62758a; font-size: 13px; }
+.pagination .page-link { color: #61758c; border-color: #e2e7ec; border-radius: 6px; margin: 0 2px; }
+.pagination .page-item.active .page-link { color: #fff; background: #6c63ff; border-color: #6c63ff; }
+.form-panel { border: 1px solid #dce3ea; border-radius: 10px; padding: 16px; background: #f8fafc; }
+.form-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 16px; }
+.empty-row { color: #7d8b99; padding: 35px !important; }
+.gestion-card .section-heading { margin-bottom: 16px; }
+@media (max-width: 768px) {
+    .section-heading { align-items: flex-start; flex-direction: column; }
+    .table-footer { flex-direction: column; align-items: flex-start; }
+    .notas-table { min-width: 760px; }
+    .filter-card .d-flex { flex-direction: column; }
+}
 </style>
